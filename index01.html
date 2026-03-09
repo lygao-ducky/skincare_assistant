@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Skincare Copilot — Context-Aware Routines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --cream: #F8F4EF;
+    --warm-white: #FDFAF6;
+    --beige: #E8DDD0;
+    --sand: #C9B9A4;
+    --warm-gray: #9B8E82;
+    --charcoal: #2C2925;
+    --espresso: #3D342C;
+    --terracotta: #B5714A;
+    --sage: #7D9079;
+    --mist: #A3B4B8;
+    --gold: #C4A46B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--cream);
+    color: var(--charcoal);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .serif { font-family: 'Cormorant Garamond', serif; }
+  .display { font-family: 'DM Serif Display', serif; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(248, 244, 239, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--beige);
+    padding: 1rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: var(--espresso);
+  }
+  .nav-logo span { color: var(--terracotta); font-style: italic; }
+  .nav-pill {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    border: 1px solid var(--sand);
+    padding: 0.3rem 0.85rem;
+    border-radius: 99px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 9rem 1.5rem 3rem;
+    text-align: center;
+    position: relative; z-index: 1;
+  }
+  .hero-kicker {
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 1.1rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  }
+  .hero-kicker::before, .hero-kicker::after {
+    content: ''; display: block;
+    width: 30px; height: 1px;
+    background: var(--terracotta); opacity: 0.5;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--espresso);
+    margin-bottom: 1.1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--terracotta); }
+  .hero-sub {
+    font-size: 0.95rem;
+    color: var(--warm-gray);
+    max-width: 460px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--warm-white);
+    border: 1px solid var(--beige);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .card-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sand);
+    margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .card-label i { color: var(--terracotta); }
+
+  /* ── ENVIRONMENT WIDGET ── */
+  .env-widget {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+  .env-stat {
+    background: var(--cream);
+    border: 1px solid var(--beige);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    text-align: center;
+  }
+  .env-stat-icon { font-size: 1.1rem; margin-bottom: 0.35rem; color: var(--terracotta); }
+  .env-stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 500;
+    color: var(--espresso);
+    line-height: 1.1;
+  }
+  .env-stat-label {
+    font-size: 0.6rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--warm-gray);
+    margin-top: 0.2rem;
+  }
+  .env-badge {
+    display: inline-block;
+    font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.15rem 0.5rem; border-radius: 99px;
+    font-weight: 500;
+  }
+  .badge-yellow { background: #FEF3C7; color: #92400E; }
+  .badge-blue   { background: #DBEAFE; color: #1E40AF; }
+  .badge-red    { background: #FEE2E2; color: #991B1B; }
+
+  /* ── SKIN STATUS ── */
+  .skin-tags { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+  .skin-tag {
+    cursor: pointer;
+    border: 1.5px solid var(--beige);
+    border-radius: 99px;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.82rem;
+    color: var(--warm-gray);
+    transition: all 0.2s ease;
+    user-select: none;
+    background: var(--cream);
+    position: relative;
+  }
+  .skin-tag:hover { border-color: var(--sand); color: var(--espresso); }
+  .skin-tag.active {
+    border-color: var(--terracotta);
+    background: #B5714A12;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .skin-tag .tag-check {
+    display: none; margin-right: 0.3rem;
+    font-size: 0.7rem;
+  }
+  .skin-tag.active .tag-check { display: inline; }
+
+  /* ── PRODUCT CABINET ── */
+  .product-grid { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+  .product-pill {
+    cursor: pointer;
+    border: 1.5px solid var(--beige);
+    border-radius: 8px;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.8rem;
+    color: var(--warm-gray);
+    transition: all 0.2s ease;
+    user-select: none;
+    background: var(--cream);
+    display: flex; align-items: center; gap: 0.45rem;
+  }
+  .product-pill:hover { border-color: var(--sand); color: var(--espresso); }
+  .product-pill.selected {
+    border-color: var(--sage);
+    background: #7D907912;
+    color: var(--espresso);
+  }
+  .product-pill .check-icon {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--sand);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; color: transparent;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .product-pill.selected .check-icon {
+    background: var(--sage); border-color: var(--sage); color: white;
+  }
+
+  /* ── CTA BUTTON ── */
+  .cta-btn {
+    background: var(--espresso);
+    color: var(--cream);
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 2.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex; align-items: center; gap: 0.65rem;
+    position: relative; overflow: hidden;
+  }
+  .cta-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 100%);
+  }
+  .cta-btn:hover {
+    background: var(--terracotta);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(181,113,74,0.3);
+  }
+  .cta-btn:active { transform: translateY(0); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+
+  .fade-up { animation: fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+
+  /* ── SECTION TRANSITIONS ── */
+  #input-section { transition: all 0.45s ease; }
+  #output-section {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  #output-section.visible {
+    display: block;
+    opacity: 1;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  /* ── DIVIDER ── */
+  .ornament-divider {
+    display: flex; align-items: center; gap: 1rem;
+    color: var(--sand); font-size: 0.65rem; letter-spacing: 0.15em;
+    text-transform: uppercase; margin: 0.5rem 0;
+  }
+  .ornament-divider::before, .ornament-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--beige);
+  }
+
+  /* ── POSTER ── */
+  .poster-header {
+    text-align: center;
+    padding: 2.5rem 2rem 2rem;
+    border-bottom: 1px solid var(--beige);
+  }
+  .poster-header-kicker {
+    font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--terracotta); margin-bottom: 0.75rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--terracotta); display: inline-block;
+    animation: pulse-dot 1.8s ease infinite;
+  }
+  .poster-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: var(--espresso); line-height: 1.15;
+  }
+  .poster-title em { font-style: italic; color: var(--terracotta); }
+  .poster-meta {
+    font-size: 0.75rem; color: var(--warm-gray);
+    margin-top: 0.6rem; letter-spacing: 0.04em;
+  }
+
+  /* ── ROUTINE COLUMNS ── */
+  .routine-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0; border-bottom: 1px solid var(--beige);
+  }
+  @media (max-width: 600px) { .routine-grid { grid-template-columns: 1fr; } }
+
+  .routine-col {
+    padding: 2rem;
+  }
+  .routine-col:first-child { border-right: 1px solid var(--beige); }
+  @media (max-width: 600px) {
+    .routine-col:first-child { border-right: none; border-bottom: 1px solid var(--beige); }
+  }
+
+  .routine-col-header {
+    display: flex; align-items: center; gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+  .time-badge {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+  }
+  .am-badge { background: #FEF9EC; color: #C4A46B; border: 1px solid #E8D9A8; }
+  .pm-badge { background: #EEF0F8; color: #5C6BC0; border: 1px solid #C5CBE8; }
+  .routine-col-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; font-weight: 500;
+    color: var(--espresso);
+  }
+  .routine-col-sub { font-size: 0.68rem; color: var(--warm-gray); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .step-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .step-item {
+    display: flex; align-items: flex-start; gap: 0.85rem;
+    animation: slideIn 0.45s ease both;
+  }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 500; flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .am-num { background: #FEF3C7; color: #92400E; }
+  .pm-num { background: #EEF0F8; color: #3730A3; }
+  .step-text { flex: 1; }
+  .step-action {
+    font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--warm-gray); margin-bottom: 0.1rem;
+  }
+  .step-product {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-weight: 500;
+    color: var(--espresso); line-height: 1.2;
+  }
+  .step-note { font-size: 0.72rem; color: var(--warm-gray); margin-top: 0.15rem; }
+
+  /* Highlight for "filled gap" items */
+  .step-item.gap-fill .step-product { color: var(--terracotta); }
+  .step-item.gap-fill .step-note { color: var(--terracotta); font-style: italic; }
+
+  /* ── ALERT ── */
+  .copilot-alert {
+    margin: 1.5rem 2rem;
+    border: 1px solid #FDE68A;
+    background: #FFFBEB;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    display: flex; align-items: flex-start; gap: 0.75rem;
+  }
+  .alert-icon { color: #D97706; font-size: 0.9rem; margin-top: 0.05rem; }
+  .alert-text { font-size: 0.8rem; color: #92400E; line-height: 1.5; }
+  .alert-label {
+    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #B45309; margin-bottom: 0.25rem;
+  }
+
+  /* ── GAPS & RECS ── */
+  .gaps-section {
+    padding: 1.75rem 2rem;
+    border-bottom: 1px solid var(--beige);
+  }
+  .gaps-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+  .gap-card {
+    background: var(--cream);
+    border: 1px solid var(--beige);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    flex: 1; min-width: 200px;
+    display: flex; align-items: flex-start; gap: 0.75rem;
+  }
+  .gap-card-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: #B5714A18; color: var(--terracotta);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; flex-shrink: 0;
+  }
+  .gap-card-name { font-size: 0.85rem; font-weight: 500; color: var(--espresso); }
+  .gap-card-why { font-size: 0.72rem; color: var(--warm-gray); margin-top: 0.15rem; }
+
+  /* ── BRAND REC ── */
+  .brand-rec {
+    padding: 1.75rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1.25rem;
+    border-bottom: 1px solid var(--beige);
+    background: linear-gradient(135deg, #F8F0E8 0%, var(--warm-white) 100%);
+  }
+  .brand-rec-left { display: flex; gap: 1rem; align-items: center; }
+  .brand-rec-swatch {
+    width: 52px; height: 52px; border-radius: 10px;
+    background: linear-gradient(135deg, #C9B9A4, #B5714A);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1.1rem; flex-shrink: 0;
+  }
+  .brand-rec-label {
+    font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--warm-gray); margin-bottom: 0.2rem;
+  }
+  .brand-rec-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 500; color: var(--espresso);
+  }
+  .brand-rec-desc { font-size: 0.76rem; color: var(--warm-gray); margin-top: 0.1rem; }
+  .shop-btn {
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--espresso); border: 1.5px solid var(--espresso);
+    border-radius: 99px; padding: 0.5rem 1.2rem;
+    cursor: pointer; background: transparent;
+    transition: all 0.2s ease; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .shop-btn:hover {
+    background: var(--espresso); color: var(--cream);
+  }
+
+  /* ── POSTER FOOTER ── */
+  .poster-footer {
+    padding: 1.5rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem; color: var(--warm-gray); letter-spacing: 0.05em;
+  }
+  .footer-brand strong { color: var(--terracotta); }
+  .reset-btn {
+    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--warm-gray); border: 1px solid var(--beige);
+    border-radius: 99px; padding: 0.45rem 1.1rem;
+    cursor: pointer; background: transparent;
+    transition: all 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+  }
+  .reset-btn:hover { border-color: var(--sand); color: var(--espresso); }
+
+  /* ── LOADING STATE ── */
+  .loading-screen {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(248,244,239,0.92);
+    backdrop-filter: blur(8px);
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 1.5rem;
+  }
+  .loading-screen.active { display: flex; }
+  .loading-rings {
+    position: relative; width: 60px; height: 60px;
+  }
+  .ring {
+    position: absolute; border-radius: 50%; border: 2px solid transparent;
+    animation: spin 1.5s linear infinite;
+  }
+  .ring-1 {
+    inset: 0; border-top-color: var(--terracotta);
+    animation-duration: 1.2s;
+  }
+  .ring-2 {
+    inset: 8px; border-top-color: var(--sand);
+    animation-duration: 1.8s; animation-direction: reverse;
+  }
+  .ring-3 {
+    inset: 16px; border-top-color: var(--sage);
+    animation-duration: 2.4s;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; color: var(--espresso); text-align: center;
+  }
+  .loading-sub {
+    font-size: 0.75rem; color: var(--warm-gray); text-align: center;
+    max-width: 240px;
+  }
+  .loading-steps { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+  .loading-step {
+    font-size: 0.72rem; color: var(--warm-gray);
+    display: flex; align-items: center; gap: 0.5rem;
+    opacity: 0; transition: opacity 0.4s ease;
+  }
+  .loading-step.done { opacity: 1; color: var(--sage); }
+  .loading-step i { font-size: 0.65rem; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Skincare <span>Copilot</span></div>
+  <div class="nav-pill"><i class="fas fa-circle" style="color:var(--terracotta);font-size:0.4rem;vertical-align:middle;margin-right:0.3rem;"></i>Context-Aware</div>
+</nav>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-rings">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+  </div>
+  <div>
+    <div class="loading-text">Analysing your context…</div>
+    <div class="loading-steps" id="loading-steps">
+      <div class="loading-step" data-step="0"><i class="fas fa-check"></i> Reading environment data</div>
+      <div class="loading-step" data-step="1"><i class="fas fa-check"></i> Checking ingredient conflicts</div>
+      <div class="loading-step" data-step="2"><i class="fas fa-check"></i> Applying skin-state rules</div>
+      <div class="loading-step" data-step="3"><i class="fas fa-check"></i> Building your routine</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ INPUT SECTION ═══════════════ -->
+<div id="input-section">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-kicker fade-up">Context-Aware Skincare Intelligence</div>
+    <h1 class="fade-up delay-1">Your skin deserves a routine<br><em>built for today.</em></h1>
+    <p class="hero-sub fade-up delay-2">Tell us what you have, how your skin feels, and we'll handle the rest — factoring in live weather, ingredient conflicts, and UV levels.</p>
+  </div>
+
+  <!-- Cards Container -->
+  <div style="max-width:800px;margin:0 auto;padding:0 1.5rem 6rem;position:relative;z-index:1;display:flex;flex-direction:column;gap:1.25rem;">
+
+    <!-- Environment Widget -->
+    <div class="card fade-up delay-1">
+      <div class="card-label"><i class="fas fa-location-dot"></i> Live Environment — Nantes, FR</div>
+      <div class="env-widget" id="env-widget">
+        <div class="env-stat">
+          <div class="env-stat-icon"><i class="fas fa-temperature-half"></i></div>
+          <div class="env-stat-value">14°C</div>
+          <div class="env-stat-label">Temperature</div>
+        </div>
+        <div class="env-stat">
+          <div class="env-stat-icon"><i class="fas fa-sun"></i></div>
+          <div class="env-stat-value"><span class="env-badge badge-yellow">Moderate</span></div>
+          <div class="env-stat-label">UV Index</div>
+        </div>
+        <div class="env-stat">
+          <div class="env-stat-icon"><i class="fas fa-droplet"></i></div>
+          <div class="env-stat-value">40%</div>
+          <div class="env-stat-label">Humidity</div>
+        </div>
+        <div class="env-stat">
+          <div class="env-stat-icon"><i class="fas fa-wind"></i></div>
+          <div class="env-stat-value"><span class="env-badge badge-blue">Dry</span></div>
+          <div class="env-stat-label">Air Quality</div>
+        </div>
+      </div>
+      <p style="font-size:0.68rem;color:var(--warm-gray);margin-top:1rem;text-align:right;letter-spacing:0.05em;">
+        <i class="fas fa-circle-info"></i> &nbsp;Data refreshed just now via local weather API
+      </p>
+    </div>
+
+    <!-- Skin Status -->
+    <div class="card fade-up delay-2">
+      <div class="card-label"><i class="fas fa-face-smile-wink"></i> Today's Skin Status</div>
+      <div class="skin-tags" id="skin-tags">
+        <div class="skin-tag active" data-skin="dry">
+          <i class="fas fa-check tag-check"></i>
+          <i class="fas fa-droplet-slash" style="font-size:0.75rem;margin-right:0.2rem;opacity:0.7;"></i>
+          Dry &amp; Dehydrated
+        </div>
+        <div class="skin-tag" data-skin="oily">
+          <i class="fas fa-check tag-check"></i>
+          <i class="fas fa-circle-dot" style="font-size:0.75rem;margin-right:0.2rem;opacity:0.7;"></i>
+          Oily &amp; Congested
+        </div>
+        <div class="skin-tag" data-skin="sensitive">
+          <i class="fas fa-check tag-check"></i>
+          <i class="fas fa-heart-crack" style="font-size:0.75rem;margin-right:0.2rem;opacity:0.7;"></i>
+          Sensitive &amp; Red
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Cabinet -->
+    <div class="card fade-up delay-3">
+      <div class="card-label"><i class="fas fa-box-open"></i> My Product Cabinet</div>
+      <p style="font-size:0.78rem;color:var(--warm-gray);margin-bottom:1.1rem;line-height:1.5;">Select the products you currently own. We'll build your routine around what you have.</p>
+      <div class="product-grid" id="product-grid">
+        <!-- JS will populate -->
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="fade-up delay-4" style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:0.5rem 0;">
+      <button class="cta-btn" id="generate-btn" onclick="generateRoutine()">
+        <i class="fas fa-wand-magic-sparkles"></i>
+        Generate Today's Routine
+      </button>
+      <p style="font-size:0.7rem;color:var(--warm-gray);letter-spacing:0.05em;">
+        <i class="fas fa-lock" style="font-size:0.6rem;"></i> &nbsp;Your data never leaves your browser
+      </p>
+    </div>
+
+  </div>
+</div><!-- end #input-section -->
+
+
+<!-- ═══════════════ OUTPUT SECTION ═══════════════ -->
+<div id="output-section">
+  <div style="max-width:800px;margin:0 auto;padding:6rem 1.5rem 6rem;position:relative;z-index:1;">
+
+    <!-- Context strip -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;" class="fade-up">
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--sage);"></div>
+        <span style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--warm-gray);">Routine generated for today</span>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;" id="context-chips">
+        <!-- chips rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Main Poster Card -->
+    <div class="card" style="padding:0;overflow:hidden;" id="poster-card">
+
+      <!-- Poster Header -->
+      <div class="poster-header">
+        <div class="poster-header-kicker">
+          <span class="live-dot"></span>
+          Skincare Copilot &mdash; Daily Routine
+        </div>
+        <div class="poster-title">Your Context-Aware Routine<br><em>for Today</em></div>
+        <div class="poster-meta" id="poster-meta"></div>
+      </div>
+
+      <!-- Alert (if any) -->
+      <div id="alert-section"></div>
+
+      <!-- Routine Columns -->
+      <div class="routine-grid">
+        <!-- AM -->
+        <div class="routine-col" id="am-col">
+          <div class="routine-col-header">
+            <div class="time-badge am-badge"><i class="fas fa-sun"></i></div>
+            <div>
+              <div class="routine-col-title">Morning</div>
+              <div class="routine-col-sub">AM Routine</div>
+            </div>
+          </div>
+          <div class="step-list" id="am-steps"></div>
+        </div>
+        <!-- PM -->
+        <div class="routine-col" id="pm-col">
+          <div class="routine-col-header">
+            <div class="time-badge pm-badge"><i class="fas fa-moon"></i></div>
+            <div>
+              <div class="routine-col-title">Evening</div>
+              <div class="routine-col-sub">PM Routine</div>
+            </div>
+          </div>
+          <div class="step-list" id="pm-steps"></div>
+        </div>
+      </div>
+
+      <!-- Gaps Section -->
+      <div id="gaps-section"></div>
+
+      <!-- Brand Recommendation -->
+      <div class="brand-rec">
+        <div class="brand-rec-left">
+          <div class="brand-rec-swatch"><i class="fas fa-flask-vial"></i></div>
+          <div>
+            <div class="brand-rec-label">Based on today's dry weather, we recommend</div>
+            <div class="brand-rec-name">Embryolisse Lait-Crème Concentré</div>
+            <div class="brand-rec-desc">Rich yet non-greasy hydration — perfect for cold, dry Nantes winters. Complements ceramide-based routines beautifully.</div>
+          </div>
+        </div>
+        <a href="#" class="shop-btn" onclick="return false;">
+          <i class="fas fa-arrow-up-right-from-square" style="font-size:0.6rem;"></i>
+          Shop Now
+        </a>
+      </div>
+
+      <!-- Poster Footer -->
+      <div class="poster-footer">
+        <div class="footer-brand">Made by <strong>Skincare Copilot</strong> · skincare-copilot.com</div>
+        <button class="reset-btn" onclick="resetApp()">
+          <i class="fas fa-arrow-left" style="font-size:0.7rem;"></i>
+          Back to Cabinet
+        </button>
+      </div>
+
+    </div><!-- end poster-card -->
+
+    <p style="text-align:center;font-size:0.7rem;color:var(--warm-gray);margin-top:1.5rem;letter-spacing:0.05em;">
+      <i class="fas fa-circle-info"></i>&nbsp; Skincare Copilot is an informational tool, not a substitute for dermatological advice.
+    </p>
+  </div>
+</div><!-- end #output-section -->
+
+
+<script>
+// ─── PRODUCT DATA ────────────────────────────────────────
+const PRODUCTS = [
+  { id: 'vitc',     label: 'Vitamin C Serum',     icon: 'fas fa-lemon' },
+  { id: 'retinol',  label: 'Retinol 1%',           icon: 'fas fa-moon' },
+  { id: 'aha',      label: 'AHA/BHA Exfoliant',    icon: 'fas fa-vial' },
+  { id: 'ha',       label: 'Hyaluronic Acid',      icon: 'fas fa-droplet' },
+  { id: 'ceramide', label: 'Heavy Ceramide Cream', icon: 'fas fa-shield' },
+  { id: 'gel',      label: 'Gel Water Cream',      icon: 'fas fa-wind' },
+  { id: 'spf',      label: 'SPF 50 Sunscreen',     icon: 'fas fa-sun' },
+];
+
+// ─── INIT ────────────────────────────────────────────────
+const selectedProducts = new Set();
+let activeSkin = 'dry';
+
+function init() {
+  const grid = document.getElementById('product-grid');
+  PRODUCTS.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'product-pill';
+    el.dataset.id = p.id;
+    el.innerHTML = `<div class="check-icon"><i class="fas fa-check"></i></div>
+                    <i class="${p.icon}" style="color:var(--warm-gray);font-size:0.8rem;"></i>
+                    ${p.label}`;
+    el.addEventListener('click', () => toggleProduct(p.id, el));
+    grid.appendChild(el);
+  });
+
+  // Skin tag listeners
+  document.querySelectorAll('.skin-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      document.querySelectorAll('.skin-tag').forEach(t => t.classList.remove('active'));
+      tag.classList.add('active');
+      activeSkin = tag.dataset.skin;
+    });
+  });
+}
+
+function toggleProduct(id, el) {
+  if (selectedProducts.has(id)) {
+    selectedProducts.delete(id);
+    el.classList.remove('selected');
+  } else {
+    selectedProducts.add(id);
+    el.classList.add('selected');
+  }
+}
+
+// ─── LOGIC ──────────────────────────────────────────────
+const ENV = { temp: '14°C', uv: 'Moderate', humidity: 40, location: 'Nantes' };
+
+function buildRoutine() {
+  const has = id => selectedProducts.has(id);
+  const skinDry       = activeSkin === 'dry';
+  const skinOily      = activeSkin === 'oily';
+  const skinSensitive = activeSkin === 'sensitive';
+  const uvHighOrMod   = ['Moderate','High'].includes(ENV.uv);
+  const lowHumidity   = ENV.humidity < 50;
+
+  const amSteps = [];
+  const pmSteps = [];
+  const gaps    = [];
+  const alerts  = [];
+
+  // ── AM ROUTINE ──────────────────────────────────────────
+  amSteps.push({ action: 'Cleanse', product: 'Gentle Cleanser', note: 'Rinse with lukewarm water' });
+
+  // Rule 1: Vitamin C → AM
+  if (has('vitc')) {
+    amSteps.push({ action: 'Treat', product: 'Vitamin C Serum', note: 'Brightens & antioxidant protection' });
+  }
+
+  // Rule 2: Dry skin + low humidity → HA + Ceramide in both
+  if (skinDry && lowHumidity) {
+    if (has('ha')) {
+      amSteps.push({ action: 'Hydrate', product: 'Hyaluronic Acid', note: 'Apply to damp skin for best absorption' });
+    } else {
+      gaps.push({ product: 'Hyaluronic Acid', icon: 'fas fa-droplet', reason: 'Low humidity (40%) dehydrates skin fast — HA locks moisture in.' });
+    }
+    if (has('ceramide')) {
+      amSteps.push({ action: 'Seal', product: 'Heavy Ceramide Cream', note: 'Reinforces barrier in dry air' });
+    } else if (!has('gel')) {
+      gaps.push({ product: 'Heavy Ceramide Cream', icon: 'fas fa-shield', reason: 'Cold dry air depletes your skin barrier — ceramides rebuild it.' });
+    }
+    if (has('gel') && !has('ceramide')) {
+      amSteps.push({ action: 'Moisturise', product: 'Gel Water Cream', note: 'Lightweight hydration layer' });
+    }
+  } else {
+    if (has('ha'))  amSteps.push({ action: 'Hydrate', product: 'Hyaluronic Acid', note: 'Plumps and cushions the skin' });
+    if (has('gel')) amSteps.push({ action: 'Moisturise', product: 'Gel Water Cream', note: 'Lightweight finish' });
+    else if (has('ceramide')) amSteps.push({ action: 'Moisturise', product: 'Heavy Ceramide Cream', note: 'Locks in moisture' });
+  }
+
+  // Rule 3: SPF enforcement
+  if (uvHighOrMod || has('vitc') || has('retinol')) {
+    if (has('spf')) {
+      amSteps.push({ action: 'Protect', product: 'SPF 50 Sunscreen', note: 'Essential — UV is Moderate today', isSPF: true });
+    } else {
+      amSteps.push({ action: 'Protect', product: 'SPF 50 Sunscreen ★ Needed', note: 'Added from recommended purchases', gapFill: true, isSPF: true });
+      gaps.push({ product: 'SPF 50 Sunscreen', icon: 'fas fa-sun', reason: `UV is ${ENV.uv} today${has('vitc') || has('retinol') ? ' + active ingredients increase photosensitivity' : ''}.` });
+    }
+  }
+
+  // ── PM ROUTINE ──────────────────────────────────────────
+  pmSteps.push({ action: 'Double Cleanse', product: 'Oil Cleanser + Foaming Wash', note: 'Removes SPF and makeup thoroughly' });
+
+  // Rule 1: Retinol → PM (conflicts with Vit C)
+  if (has('retinol')) {
+    pmSteps.push({ action: 'Renew', product: 'Retinol 1%', note: 'Start with 2× per week, build tolerance' });
+  }
+
+  // AHA/BHA — only if no retinol tonight (Rule 4)
+  if (has('aha') && has('retinol')) {
+    alerts.push('skin-copilot-alert');
+    // Schedule AHA on alternate nights — show as note, not tonight's step
+    pmSteps.push({ action: 'Exfoliate', product: 'AHA/BHA Exfoliant', note: '★ Alternate nights only — not tonight (Retinol is active)', inactive: true });
+  } else if (has('aha')) {
+    pmSteps.push({ action: 'Exfoliate', product: 'AHA/BHA Exfoliant', note: 'Use 2–3× per week max' });
+  }
+
+  // Rule 2 continued: HA + Ceramide PM
+  if (skinDry && lowHumidity) {
+    if (has('ha')) pmSteps.push({ action: 'Hydrate', product: 'Hyaluronic Acid', note: 'Skin absorbs actives better overnight' });
+    if (has('ceramide')) pmSteps.push({ action: 'Barrier Repair', product: 'Heavy Ceramide Cream', note: 'Occlusive seal for overnight recovery' });
+    else if (has('gel')) pmSteps.push({ action: 'Moisturise', product: 'Gel Water Cream', note: 'Lightweight if ceramide is unavailable' });
+  } else {
+    if (has('ha')) pmSteps.push({ action: 'Hydrate', product: 'Hyaluronic Acid', note: '' });
+    if (has('ceramide')) pmSteps.push({ action: 'Moisturise', product: 'Heavy Ceramide Cream', note: 'Rich overnight recovery' });
+    else if (has('gel')) pmSteps.push({ action: 'Moisturise', product: 'Gel Water Cream', note: '' });
+  }
+
+  const showAlert = has('retinol') && has('aha');
+  return { amSteps, pmSteps, gaps, showAlert };
+}
+
+// ─── RENDER ──────────────────────────────────────────────
+function renderStep(step, index, period) {
+  const numClass = period === 'am' ? 'am-num' : 'pm-num';
+  const gapClass = step.gapFill ? ' gap-fill' : '';
+  const inactiveStyle = step.inactive ? 'opacity:0.45;text-decoration:line-through;text-decoration-color:var(--sand);' : '';
+  return `
+    <div class="step-item${gapClass}" style="animation-delay:${0.1 + index * 0.07}s;${inactiveStyle}">
+      <div class="step-num ${numClass}">${index + 1}</div>
+      <div class="step-text">
+        <div class="step-action">${step.action}</div>
+        <div class="step-product">${step.product}</div>
+        ${step.note ? `<div class="step-note">${step.note}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderGaps(gaps) {
+  if (!gaps.length) return '';
+  const cards = gaps.map(g => `
+    <div class="gap-card">
+      <div class="gap-card-icon"><i class="${g.icon}"></i></div>
+      <div>
+        <div class="gap-card-name">${g.product}</div>
+        <div class="gap-card-why">${g.reason}</div>
+      </div>
+    </div>`).join('');
+  return `
+    <div class="gaps-section">
+      <div class="card-label" style="margin-bottom:0;"><i class="fas fa-triangle-exclamation" style="color:var(--terracotta);"></i> Missing from Your Cabinet</div>
+      <div class="gaps-grid">${cards}</div>
+    </div>`;
+}
+
+// ─── GENERATE ────────────────────────────────────────────
+function generateRoutine() {
+  // Show loading
+  const loader = document.getElementById('loading-screen');
+  loader.classList.add('active');
+  const loadSteps = document.querySelectorAll('.loading-step');
+
+  let stepIdx = 0;
+  const stepInterval = setInterval(() => {
+    if (stepIdx < loadSteps.length) {
+      loadSteps[stepIdx].classList.add('done');
+      stepIdx++;
+    } else {
+      clearInterval(stepInterval);
+      setTimeout(() => {
+        loader.classList.remove('active');
+        // Compute
+        const { amSteps, pmSteps, gaps, showAlert } = buildRoutine();
+        // Render
+        document.getElementById('am-steps').innerHTML = amSteps.map((s, i) => renderStep(s, i, 'am')).join('');
+        document.getElementById('pm-steps').innerHTML = pmSteps.map((s, i) => renderStep(s, i, 'pm')).join('');
+        document.getElementById('gaps-section').innerHTML = renderGaps(gaps);
+
+        // Alert
+        const alertEl = document.getElementById('alert-section');
+        alertEl.innerHTML = showAlert ? `
+          <div class="copilot-alert">
+            <i class="fas fa-triangle-exclamation alert-icon"></i>
+            <div class="alert-text">
+              <div class="alert-label"><i class="fas fa-robot"></i>&nbsp; Skin Copilot Alert</div>
+              Avoid using Retinol and AHA/BHA Exfoliants on the same night — this can damage your moisture barrier. We've scheduled Retinol for tonight and crossed out the exfoliant. Alternate them every other evening.
+            </div>
+          </div>` : '';
+
+        // Context chips
+        const skinLabels = { dry: 'Dry & Dehydrated', oily: 'Oily & Congested', sensitive: 'Sensitive & Red' };
+        const chipStyle = `font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.7rem;border-radius:99px;background:var(--cream);border:1px solid var(--beige);color:var(--warm-gray);`;
+        document.getElementById('context-chips').innerHTML = `
+          <span style="${chipStyle}"><i class="fas fa-location-dot" style="color:var(--terracotta);margin-right:0.3rem;font-size:0.55rem;"></i>${ENV.location}</span>
+          <span style="${chipStyle}"><i class="fas fa-sun" style="color:var(--gold);margin-right:0.3rem;font-size:0.55rem;"></i>UV ${ENV.uv}</span>
+          <span style="${chipStyle}"><i class="fas fa-droplet" style="color:var(--mist);margin-right:0.3rem;font-size:0.55rem;"></i>${ENV.humidity}% Humidity</span>
+          <span style="${chipStyle}"><i class="fas fa-face-smile-wink" style="margin-right:0.3rem;font-size:0.55rem;"></i>${skinLabels[activeSkin]}</span>`;
+
+        // Meta
+        const now = new Date();
+        document.getElementById('poster-meta').textContent =
+          now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) +
+          ' · ' + ENV.location + ' · ' + ENV.temp;
+
+        // Swap sections
+        document.getElementById('input-section').style.display = 'none';
+        const out = document.getElementById('output-section');
+        out.classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 400);
+    }
+  }, 480);
+}
+
+// ─── RESET ───────────────────────────────────────────────
+function resetApp() {
+  document.getElementById('output-section').classList.remove('visible');
+  document.getElementById('output-section').style.display = 'none';
+  document.getElementById('input-section').style.display = 'block';
+  // reset loading steps
+  document.querySelectorAll('.loading-step').forEach(s => s.classList.remove('done'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── BOOT ────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
