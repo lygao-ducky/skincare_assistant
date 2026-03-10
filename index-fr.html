@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Skincare Copilot — Routines Intelligentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --cream:#F8F4EF;--warm-white:#FDFAF6;--beige:#E8DDD0;--sand:#C9B9A4;
+  --warm-gray:#9B8E82;--charcoal:#2C2925;--espresso:#3D342C;
+  --terracotta:#B5714A;--sage:#7D9079;--mist:#A3B4B8;--gold:#C4A46B;
+  --rose:#C47A7A;--lavender:#9B8FBE;
+  --green-light:#E8F0E9;--green:#5A7D5E;
+  --red-light:#FDE8E8;--red:#B85555;
+  --yellow-light:#FEF3C7;--yellow:#B45309;
+  --blue-light:#E8F0F8;--blue:#4A6FA5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--charcoal);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+.serif{font-family:'Cormorant Garamond',serif}
+.display{font-family:'DM Serif Display',serif}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,244,239,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--beige);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;letter-spacing:.05em;color:var(--espresso)}
+.nav-logo span{color:var(--terracotta);font-style:italic}
+.nav-steps{display:flex;gap:.4rem;align-items:center}
+.nav-step{width:7px;height:7px;border-radius:50%;background:var(--beige);transition:all .3s ease}
+.nav-step.active{background:var(--terracotta);transform:scale(1.3)}
+.nav-step.done{background:var(--sage)}
+
+/* HERO */
+.hero{padding:8rem 1.5rem 2rem;text-align:center;position:relative;z-index:1}
+.hero-kicker{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--terracotta);margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:.6rem}
+.hero-kicker::before,.hero-kicker::after{content:'';display:block;width:28px;height:1px;background:var(--terracotta);opacity:.5}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:400;line-height:1.1;color:var(--espresso);margin-bottom:1rem}
+.hero h1 em{font-style:italic;color:var(--terracotta)}
+.hero-sub{font-size:.9rem;color:var(--warm-gray);max-width:440px;margin:0 auto 2rem;line-height:1.7;font-weight:300}
+
+/* STEP PROGRESS */
+.step-progress{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2.5rem;position:relative;z-index:1}
+.sp-item{display:flex;flex-direction:column;align-items:center;gap:.4rem;position:relative}
+.sp-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--beige);background:var(--warm-white);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--warm-gray);transition:all .3s ease;z-index:2;position:relative}
+.sp-dot.active{border-color:var(--terracotta);background:var(--terracotta);color:white}
+.sp-dot.done{border-color:var(--sage);background:var(--sage);color:white}
+.sp-label{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--warm-gray);white-space:nowrap}
+.sp-label.active{color:var(--terracotta)}
+.sp-line{width:60px;height:1px;background:var(--beige);margin-top:-16px;z-index:1}
+@media(max-width:480px){.sp-line{width:30px}}
+
+/* CARDS */
+.card{background:var(--warm-white);border:1px solid var(--beige);border-radius:16px;padding:2rem;position:relative;z-index:1}
+.card-label{font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:var(--sand);margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+.card-label i{color:var(--terracotta)}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:var(--espresso);margin-bottom:.35rem}
+.section-desc{font-size:.8rem;color:var(--warm-gray);margin-bottom:1.5rem;line-height:1.6}
+
+/* SKIN TYPE GRID */
+.skin-type-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem}
+@media(max-width:520px){.skin-type-grid{grid-template-columns:repeat(3,1fr)}}
+.skin-type-card{cursor:pointer;border:1.5px solid var(--beige);border-radius:12px;padding:.9rem .5rem;text-align:center;transition:all .2s ease;user-select:none;background:var(--cream)}
+.skin-type-card:hover{border-color:var(--sand)}
+.skin-type-card.active{border-color:var(--terracotta);background:#B5714A0D}
+.skin-type-icon{font-size:1.2rem;margin-bottom:.4rem}
+.skin-type-name{font-size:.72rem;font-weight:500;color:var(--espresso)}
+.skin-type-card.active .skin-type-name{color:var(--terracotta)}
+.skin-type-note{font-size:.6rem;color:var(--warm-gray);margin-top:.2rem;line-height:1.3}
+
+/* CONCERN TAGS */
+.concern-grid{display:flex;flex-wrap:wrap;gap:.55rem}
+.concern-tag{cursor:pointer;border:1.5px solid var(--beige);border-radius:8px;padding:.55rem 1rem;font-size:.78rem;color:var(--warm-gray);transition:all .2s;user-select:none;background:var(--cream);display:flex;align-items:center;gap:.4rem}
+.concern-tag:hover{border-color:var(--sand);color:var(--espresso)}
+.concern-tag.active{border-color:var(--rose);background:#C47A7A0D;color:var(--rose)}
+.concern-tag i{font-size:.72rem}
+
+/* ENV WIDGET */
+.env-widget{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+@media(max-width:500px){.env-widget{grid-template-columns:repeat(2,1fr)}}
+.env-stat{background:var(--cream);border:1px solid var(--beige);border-radius:10px;padding:.85rem 1rem;text-align:center}
+.env-stat-icon{font-size:1rem;margin-bottom:.3rem;color:var(--terracotta)}
+.env-stat-value{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:var(--espresso);line-height:1.1}
+.env-stat-label{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--warm-gray);margin-top:.15rem}
+.env-badge{display:inline-block;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .5rem;border-radius:99px;font-weight:500}
+.badge-yellow{background:#FEF3C7;color:#92400E}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+
+/* PRODUCT CABINET */
+.brand-accordion{border:1px solid var(--beige);border-radius:12px;overflow:hidden;margin-bottom:.65rem}
+.brand-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer;background:var(--cream);transition:background .2s;user-select:none}
+.brand-header:hover{background:var(--beige)}
+.brand-header.open{background:var(--warm-white);border-bottom:1px solid var(--beige)}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;color:var(--espresso)}
+.brand-meta{font-size:.68rem;color:var(--warm-gray);margin-top:.1rem}
+.brand-chevron{color:var(--warm-gray);font-size:.8rem;transition:transform .25s ease}
+.brand-header.open .brand-chevron{transform:rotate(180deg)}
+.brand-products{display:none;padding:1rem 1.25rem;gap:.55rem;flex-wrap:wrap}
+.brand-products.open{display:flex}
+
+.product-chip{cursor:pointer;border:1.5px solid var(--beige);border-radius:8px;padding:.55rem .9rem;font-size:.78rem;color:var(--warm-gray);transition:all .2s;user-select:none;background:var(--warm-white);display:flex;align-items:center;gap:.5rem;position:relative}
+.product-chip:hover{border-color:var(--sand);color:var(--espresso)}
+.product-chip.selected{border-color:var(--sage);background:#7D90790D;color:var(--espresso)}
+.product-chip .chip-check{width:15px;height:15px;border:1.5px solid var(--sand);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:transparent;flex-shrink:0;transition:all .2s}
+.product-chip.selected .chip-check{background:var(--sage);border-color:var(--sage);color:white}
+.product-chip .info-btn{margin-left:.2rem;color:var(--mist);font-size:.7rem;cursor:pointer;padding:.1rem .2rem;border-radius:4px;transition:color .2s}
+.product-chip .info-btn:hover{color:var(--blue)}
+
+/* INGREDIENT PANEL */
+.ingredient-panel{display:none;background:var(--cream);border-top:1px solid var(--beige);padding:1rem 1.25rem;animation:slideDown .25s ease}
+.ingredient-panel.open{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.ing-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.ing-panel-title{font-size:.78rem;font-weight:500;color:var(--espresso)}
+.ing-panel-actions{display:flex;gap:.5rem;align-items:center}
+.inci-link{font-size:.65rem;color:var(--blue);text-decoration:none;border:1px solid var(--blue-light);border-radius:99px;padding:.2rem .6rem;transition:all .2s}
+.inci-link:hover{background:var(--blue);color:white}
+.ing-grid{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.85rem}
+.ing-tag{font-size:.68rem;padding:.25rem .6rem;border-radius:6px;display:flex;align-items:center;gap:.3rem}
+.ing-tag.good{background:var(--green-light);color:var(--green)}
+.ing-tag.bad{background:var(--red-light);color:var(--red)}
+.ing-tag.neutral{background:#F0EDE8;color:var(--warm-gray)}
+.ing-tag.caution{background:var(--yellow-light);color:var(--yellow)}
+.ing-legend{display:flex;gap:.75rem;flex-wrap:wrap}
+.ing-legend-item{font-size:.6rem;color:var(--warm-gray);display:flex;align-items:center;gap:.3rem}
+.ing-legend-dot{width:8px;height:8px;border-radius:2px}
+
+/* STATUS BANNER inside ingredient panel */
+.skin-compatibility{border-radius:8px;padding:.7rem 1rem;font-size:.75rem;margin-top:.75rem;display:flex;gap:.6rem;align-items:flex-start}
+.compat-good{background:var(--green-light);color:var(--green)}
+.compat-warn{background:var(--yellow-light);color:var(--yellow)}
+.compat-bad{background:var(--red-light);color:var(--red)}
+
+/* SELECTED PRODUCTS SUMMARY */
+.selected-summary{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}
+.summary-chip{font-size:.68rem;padding:.25rem .7rem;border-radius:6px;background:var(--cream);border:1px solid var(--beige);color:var(--warm-gray);display:flex;align-items:center;gap:.35rem}
+.summary-chip.conflict-warn{border-color:#FDE68A;background:#FFFBEB;color:#92400E}
+.summary-chip.missing-gap{border-color:#FCA5A5;background:#FEF2F2;color:#991B1B}
+
+/* NAVIGATION BUTTONS */
+.nav-btns{display:flex;gap:.75rem;justify-content:space-between;flex-wrap:wrap;margin-top:1rem}
+.btn-back{font-size:.78rem;letter-spacing:.08em;color:var(--warm-gray);border:1px solid var(--beige);border-radius:10px;padding:.75rem 1.5rem;cursor:pointer;background:transparent;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:.5rem}
+.btn-back:hover{border-color:var(--sand);color:var(--espresso)}
+.btn-next{background:var(--espresso);color:var(--cream);border:none;border-radius:10px;padding:.75rem 2rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:.6rem}
+.btn-next:hover{background:var(--terracotta);transform:translateY(-1px);box-shadow:0 6px 20px rgba(181,113,74,.3)}
+.btn-next:active{transform:translateY(0)}
+.btn-generate{background:var(--espresso);color:var(--cream);border:none;border-radius:10px;padding:1rem 2.5rem;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;letter-spacing:.08em;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:.7rem;margin:0 auto}
+.btn-generate:hover{background:var(--terracotta);transform:translateY(-1px);box-shadow:0 8px 24px rgba(181,113,74,.35)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+.fade-up{animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}
+
+/* SECTION TRANSITIONS */
+.app-section{display:none;opacity:0}
+.app-section.visible{display:block;animation:fadeUp .5s ease both}
+#section-1{display:block;opacity:1}
+
+/* LOADING */
+.loading-screen{display:none;position:fixed;inset:0;z-index:200;background:rgba(248,244,239,.93);backdrop-filter:blur(10px);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+.loading-screen.active{display:flex}
+.loading-rings{position:relative;width:56px;height:56px}
+.ring{position:absolute;border-radius:50%;border:2px solid transparent;animation:spin 1.5s linear infinite}
+.ring-1{inset:0;border-top-color:var(--terracotta);animation-duration:1.2s}
+.ring-2{inset:8px;border-top-color:var(--sand);animation-duration:1.8s;animation-direction:reverse}
+.ring-3{inset:16px;border-top-color:var(--sage);animation-duration:2.4s}
+.loading-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--espresso)}
+.loading-step{font-size:.72rem;color:var(--warm-gray);display:flex;align-items:center;gap:.5rem;opacity:0;transition:opacity .4s}
+.loading-step.done{opacity:1;color:var(--sage)}
+
+/* ── OUTPUT / POSTER ── */
+.poster-header{text-align:center;padding:2.5rem 2rem 2rem;border-bottom:1px solid var(--beige)}
+.poster-kicker{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--terracotta);display:inline-block;animation:pulse-dot 1.8s ease infinite}
+.poster-title{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--espresso);line-height:1.15}
+.poster-title em{font-style:italic;color:var(--terracotta)}
+.poster-meta{font-size:.73rem;color:var(--warm-gray);margin-top:.6rem}
+.poster-skin-tags{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.85rem}
+.pskin-tag{font-size:.62rem;padding:.2rem .65rem;border-radius:99px;letter-spacing:.06em}
+
+.routine-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--beige)}
+@media(max-width:580px){.routine-grid{grid-template-columns:1fr}}
+.routine-col{padding:2rem}
+.routine-col:first-child{border-right:1px solid var(--beige)}
+@media(max-width:580px){.routine-col:first-child{border-right:none;border-bottom:1px solid var(--beige)}}
+.routine-col-hd{display:flex;align-items:center;gap:.65rem;margin-bottom:1.5rem}
+.time-badge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.am-badge{background:#FEF9EC;color:#C4A46B;border:1px solid #E8D9A8}
+.pm-badge{background:#EEF0F8;color:#5C6BC0;border:1px solid #C5CBE8}
+.rcol-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:var(--espresso)}
+.rcol-sub{font-size:.66rem;color:var(--warm-gray);letter-spacing:.08em;text-transform:uppercase}
+
+.step-list{display:flex;flex-direction:column;gap:.75rem}
+.step-item{display:flex;align-items:flex-start;gap:.85rem;animation:slideIn .4s ease both}
+.step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:500;flex-shrink:0;margin-top:1px}
+.am-num{background:#FEF3C7;color:#92400E}
+.pm-num{background:#EEF0F8;color:#3730A3}
+.step-action{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:.1rem}
+.step-product{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500;color:var(--espresso);line-height:1.2}
+.step-note{font-size:.7rem;color:var(--warm-gray);margin-top:.12rem;line-height:1.4}
+.step-item.gap-fill .step-product{color:var(--terracotta)}
+.step-item.gap-fill .step-note{color:var(--terracotta);font-style:italic}
+.step-item.inactive{opacity:.4}
+.step-item.inactive .step-product{text-decoration:line-through;text-decoration-color:var(--sand)}
+
+/* ingredient badge on step */
+.step-ing-flags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem}
+.step-flag{font-size:.58rem;padding:.12rem .45rem;border-radius:4px;display:inline-flex;align-items:center;gap:.25rem}
+.flag-good{background:var(--green-light);color:var(--green)}
+.flag-warn{background:var(--yellow-light);color:var(--yellow)}
+.flag-bad{background:var(--red-light);color:var(--red)}
+
+/* ALERT */
+.copilot-alert{margin:1.5rem 2rem;border:1px solid #FDE68A;background:#FFFBEB;border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:.75rem}
+.alert-icon{color:#D97706;font-size:.9rem;margin-top:.05rem}
+.alert-text{font-size:.78rem;color:#92400E;line-height:1.5}
+.alert-label{font-size:.6rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#B45309;margin-bottom:.25rem}
+
+/* SKIN ANALYSIS SECTION */
+.skin-analysis{padding:1.75rem 2rem;border-bottom:1px solid var(--beige);background:linear-gradient(135deg,#F4F0EC,var(--warm-white))}
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:1rem}
+@media(max-width:560px){.analysis-grid{grid-template-columns:1fr 1fr}}
+.analysis-card{border-radius:10px;padding:.9rem 1rem}
+.analysis-card-label{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.35rem}
+.analysis-card-val{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:500}
+
+/* GAPS */
+.gaps-section{padding:1.75rem 2rem;border-bottom:1px solid var(--beige)}
+.gaps-grid{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}
+.gap-card{background:var(--cream);border:1px solid var(--beige);border-radius:10px;padding:.9rem 1.1rem;flex:1;min-width:180px;display:flex;align-items:flex-start;gap:.65rem}
+.gap-icon{width:30px;height:30px;border-radius:8px;background:#B5714A18;color:var(--terracotta);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.gap-name{font-size:.82rem;font-weight:500;color:var(--espresso)}
+.gap-why{font-size:.7rem;color:var(--warm-gray);margin-top:.15rem;line-height:1.4}
+
+/* BRAND REC */
+.brand-rec{padding:1.75rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem;border-bottom:1px solid var(--beige);background:linear-gradient(135deg,#F8F0E8,var(--warm-white))}
+.brand-rec-swatch{width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,var(--sand),var(--terracotta));display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0}
+.brand-rec-label{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:.2rem}
+.brand-rec-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;color:var(--espresso)}
+.brand-rec-desc{font-size:.73rem;color:var(--warm-gray);margin-top:.1rem}
+.shop-btn{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--espresso);border:1.5px solid var(--espresso);border-radius:99px;padding:.5rem 1.1rem;cursor:pointer;background:transparent;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.shop-btn:hover{background:var(--espresso);color:var(--cream)}
+
+/* POSTER FOOTER */
+.poster-footer{padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--warm-gray);letter-spacing:.05em}
+.footer-brand strong{color:var(--terracotta)}
+.reset-btn{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--warm-gray);border:1px solid var(--beige);border-radius:99px;padding:.42rem 1rem;cursor:pointer;background:transparent;transition:all .2s;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:.4rem}
+.reset-btn:hover{border-color:var(--sand);color:var(--espresso)}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--cream)}
+::-webkit-scrollbar-thumb{background:var(--sand);border-radius:99px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Skincare <span>Copilot</span></div>
+  <div style="display:flex;gap:.3rem;align-items:center;margin-left:auto;padding-left:1rem"><a href="index.html" style="font-size:.65rem;letter-spacing:.06em;font-family:'DM Sans',sans-serif;padding:.3rem .65rem;border:1px solid var(--beige);border-radius:99px;text-decoration:none;transition:all .2s ease;background:transparent;color:var(--warm-gray);">EN</a><a href="index-zh.html" style="font-size:.65rem;letter-spacing:.06em;font-family:'DM Sans',sans-serif;padding:.3rem .65rem;border:1px solid var(--beige);border-radius:99px;text-decoration:none;transition:all .2s ease;background:transparent;color:var(--warm-gray);">中文</a><a href="index-fr.html" style="font-size:.65rem;letter-spacing:.06em;font-family:'DM Sans',sans-serif;padding:.3rem .65rem;border:1px solid var(--beige);border-radius:99px;text-decoration:none;transition:all .2s ease;background:var(--espresso);color:var(--cream);border-color:var(--espresso);">FR</a></div>
+  <div class="nav-steps" id="nav-steps" style="margin-left:.75rem">
+    <div class="nav-step active" title="Skin Profile"></div>
+    <div style="width:20px;height:1px;background:var(--beige)"></div>
+    <div class="nav-step" title="Environment"></div>
+    <div style="width:20px;height:1px;background:var(--beige)"></div>
+    <div class="nav-step" title="Cabinet"></div>
+    <div style="width:20px;height:1px;background:var(--beige)"></div>
+    <div class="nav-step" title="Routine"></div>
+  </div>
+</nav>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loader">
+  <div class="loading-rings"><div class="ring ring-1"></div><div class="ring ring-2"></div><div class="ring ring-3"></div></div>
+  <div style="text-align:center">
+    <div class="loading-text">Formulation de votre routine…</div>
+    <div style="display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem" id="loader-steps">
+      <div class="loading-step" data-i="0"><i class="fas fa-check"></i> Analyse de votre profil cutané</div>
+      <div class="loading-step" data-i="1"><i class="fas fa-check"></i> Vérification des interactions d'ingrédients</div>
+      <div class="loading-step" data-i="2"><i class="fas fa-check"></i> Application des règles météo & UV</div>
+      <div class="loading-step" data-i="3"><i class="fas fa-check"></i> Personnalisation selon vos préoccupations</div>
+      <div class="loading-step" data-i="4"><i class="fas fa-check"></i> Création de votre affiche</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 — SKIN PROFILE
+════════════════════════════════════════════════ -->
+<div id="section-1" class="app-section visible">
+  <div class="hero">
+    <div class="hero-kicker fade-up">Intelligence Skincare Contextuelle</div>
+    <h1 class="fade-up d1">Votre peau mérite une routine<br><em>conçue pour aujourd'hui.</em></h1>
+    <p class="hero-sub fade-up d2">Commençons par votre peau. Choisissez votre type et vos préoccupations — nous filtrerons les ingrédients et signalerons les conflits dans tous vos produits.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="step-progress fade-up d2" style="position:relative;z-index:1">
+    <div class="sp-item"><div class="sp-dot active"><i class="fas fa-circle-dot"></i></div><div class="sp-label active">Profil</div></div>
+    <div class="sp-line"></div>
+    <div class="sp-item"><div class="sp-dot" id="sp2"><i class="fas fa-cloud-sun"></i></div><div class="sp-label" id="sp2l">Contexte</div></div>
+    <div class="sp-line"></div>
+    <div class="sp-item"><div class="sp-dot" id="sp3"><i class="fas fa-box-open"></i></div><div class="sp-label" id="sp3l">Cabinet</div></div>
+    <div class="sp-line"></div>
+    <div class="sp-item"><div class="sp-dot" id="sp4"><i class="fas fa-wand-magic-sparkles"></i></div><div class="sp-label" id="sp4l">Routine</div></div>
+  </div>
+
+  <div style="max-width:760px;margin:0 auto;padding:0 1.5rem 6rem;position:relative;z-index:1;display:flex;flex-direction:column;gap:1.25rem">
+
+    <!-- Skin Type -->
+    <div class="card fade-up d2">
+      <div class="card-label"><i class="fas fa-hand-sparkles"></i> Étape 1 sur 2 — Profil cutané</div>
+      <div class="section-title">Quel est votre type de peau ?</div>
+      <div class="section-desc">Sélectionnez tout ce qui s'applique — beaucoup ont une peau mixte ou qui change selon les saisons.</div>
+      <div class="skin-type-grid" id="skin-type-grid">
+        <div class="skin-type-card" data-type="normal">
+          <div class="skin-type-icon">🌿</div>
+          <div class="skin-type-name">Normale</div>
+          <div class="skin-type-note">Équilibrée, peu de problèmes</div>
+        </div>
+        <div class="skin-type-card active" data-type="dry">
+          <div class="skin-type-icon">🏜️</div>
+          <div class="skin-type-name">Sèche</div>
+          <div class="skin-type-note">Tendue, squameuse, rugueuse</div>
+        </div>
+        <div class="skin-type-card" data-type="oily">
+          <div class="skin-type-icon">💧</div>
+          <div class="skin-type-name">Grasse</div>
+          <div class="skin-type-note">Brillante, pores dilatés</div>
+        </div>
+        <div class="skin-type-card" data-type="combination">
+          <div class="skin-type-icon">⚖️</div>
+          <div class="skin-type-name">Mixte</div>
+          <div class="skin-type-note">Zone T grasse, joues sèches</div>
+        </div>
+        <div class="skin-type-card" data-type="sensitive">
+          <div class="skin-type-icon">🌸</div>
+          <div class="skin-type-name">Sensible</div>
+          <div class="skin-type-note">Réactive, rougeurs fréquentes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skin Concerns -->
+    <div class="card fade-up d3">
+      <div class="card-label"><i class="fas fa-magnifying-glass"></i> Étape 2 sur 2 — Préoccupations cutanées</div>
+      <div class="section-title">Des préoccupations spécifiques ?</div>
+      <div class="section-desc">Sélectionnez tout ce que vous cherchez activement à traiter. Cela guide les recommandations d'ingrédients.</div>
+      <div class="concern-grid" id="concern-grid">
+        <div class="concern-tag" data-concern="acne"><i class="fas fa-circle-dot"></i> Acné / Boutons</div>
+        <div class="concern-tag" data-concern="rosacea"><i class="fas fa-face-flushed"></i> Rosacée</div>
+        <div class="concern-tag" data-concern="hyperpigmentation"><i class="fas fa-circle-half-stroke"></i> Hyperpigmentation</div>
+        <div class="concern-tag" data-concern="aging"><i class="fas fa-hourglass-half"></i> Vieillissement / Rides</div>
+        <div class="concern-tag" data-concern="dehydration"><i class="fas fa-droplet-slash"></i> Déshydratation</div>
+        <div class="concern-tag active" data-concern="barrier"><i class="fas fa-shield-halved"></i> Barrière altérée</div>
+        <div class="concern-tag" data-concern="pores"><i class="fas fa-circle-nodes"></i> Pores dilatés</div>
+        <div class="concern-tag" data-concern="eczema"><i class="fas fa-hand-dots"></i> Eczéma / Dermatite</div>
+        <div class="concern-tag" data-concern="dullness"><i class="fas fa-cloud"></i> Teint terne / Irrégulier</div>
+      </div>
+    </div>
+
+    <div class="fade-up d4" style="display:flex;justify-content:flex-end">
+      <button class="btn-next" onclick="goToSection(2)">
+        Suivant : Contexte environnemental <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 — ENVIRONMENT + TODAY'S STATUS
+════════════════════════════════════════════════ -->
+<div id="section-2" class="app-section">
+  <div style="max-width:760px;margin:0 auto;padding:7rem 1.5rem 6rem;position:relative;z-index:1;display:flex;flex-direction:column;gap:1.25rem">
+
+    <div class="fade-up">
+      <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.5rem">Contexte — Étape 2 sur 3</div>
+      <div class="section-title" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,4vw,2.4rem)">L'environnement du jour</div>
+      <p class="section-desc">Les données en direct pour votre emplacement informent les règles de protection UV, les besoins en hydratation et le soutien de la barrière cutanée.</p>
+    </div>
+
+    <!-- Env Widget -->
+    <div class="card fade-up d1">
+      <div class="card-label"><i class="fas fa-location-dot"></i> Environnement en direct — Nantes, FR</div>
+      <div class="env-widget">
+        <div class="env-stat"><div class="env-stat-icon"><i class="fas fa-temperature-half"></i></div><div class="env-stat-value">14°C</div><div class="env-stat-label">Température</div></div>
+        <div class="env-stat"><div class="env-stat-icon"><i class="fas fa-sun"></i></div><div class="env-stat-value"><span class="env-badge badge-yellow">Moderate</span></div><div class="env-stat-label">Indice UV</div></div>
+        <div class="env-stat"><div class="env-stat-icon"><i class="fas fa-droplet"></i></div><div class="env-stat-value">40%</div><div class="env-stat-label">Humidité</div></div>
+        <div class="env-stat"><div class="env-stat-icon"><i class="fas fa-wind"></i></div><div class="env-stat-value"><span class="env-badge badge-blue">Dry</span></div><div class="env-stat-label">Conditions</div></div>
+      </div>
+      <div style="margin-top:1.25rem;padding:1rem;background:var(--cream);border-radius:10px;border:1px solid var(--beige)">
+        <div style="font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--warm-gray);margin-bottom:.5rem"><i class="fas fa-triangle-exclamation" style="color:var(--gold)"></i> &nbsp;Implications contextuelles</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem" id="env-implications">
+          <span style="font-size:.7rem;background:#FEF9EC;color:#B45309;border:1px solid #FDE68A;padding:.2rem .6rem;border-radius:6px"><i class="fas fa-sun"></i> FPS obligatoire — UV modéré</span>
+          <span style="font-size:.7rem;background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE;padding:.2rem .6rem;border-radius:6px"><i class="fas fa-droplet-slash"></i> Humidité faible — intensifier l'hydratation</span>
+          <span style="font-size:.7rem;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;padding:.2rem .6rem;border-radius:6px"><i class="fas fa-shield"></i> Soutien barrière nécessaire — froid + sec</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Skin Status -->
+    <div class="card fade-up d2">
+      <div class="card-label"><i class="fas fa-face-smile-wink"></i> Comment se sent votre peau en ce moment ?</div>
+      <div class="section-desc" style="margin-bottom:1rem">Sélectionnez tout ce qui s'applique — cela affine la routine du jour par rapport à votre profil de base.</div>
+      <div class="concern-grid" id="today-status-group">
+        <div class="concern-tag active" data-status="dry_deh"><i class="fas fa-droplet-slash"></i> Sèche & Déshydratée</div>
+        <div class="concern-tag" data-status="oily_con"><i class="fas fa-circle-dot"></i> Grasse & Congestionnée</div>
+        <div class="concern-tag" data-status="sensitive_red"><i class="fas fa-heart-crack"></i> Sensible & Rougie</div>
+        <div class="concern-tag" data-status="tight"><i class="fas fa-compress"></i> Tendue & Stressée</div>
+        <div class="concern-tag" data-status="dull_today"><i class="fas fa-cloud"></i> Terne & Fatiguée</div>
+        <div class="concern-tag" data-status="breakout"><i class="fas fa-circle-exclamation"></i> Éruption active</div>
+        <div class="concern-tag" data-status="balanced"><i class="fas fa-check-circle"></i> En équilibre</div>
+      </div>
+    </div>
+
+    <div class="nav-btns fade-up d3">
+      <button class="btn-back" onclick="goToSection(1)"><i class="fas fa-arrow-left"></i> Retour</button>
+      <button class="btn-next" onclick="goToSection(3)">Suivant : Mon armoire à produits <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 — PRODUCT CABINET
+════════════════════════════════════════════════ -->
+<div id="section-3" class="app-section">
+  <div style="max-width:760px;margin:0 auto;padding:7rem 1.5rem 6rem;position:relative;z-index:1;display:flex;flex-direction:column;gap:1.25rem">
+
+    <div class="fade-up">
+      <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.5rem">Cabinet — Étape 3 sur 3</div>
+      <div class="section-title" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,4vw,2.4rem)">Mon armoire à produits</div>
+      <p class="section-desc">Sélectionnez les marques et produits que vous possédez. Cliquez sur l'icône fiole pour analyser les ingrédients selon votre profil cutané.</p>
+    </div>
+
+    <!-- Cabinet accordion — JS renders this -->
+    <div id="cabinet-container" class="fade-up d1"></div>
+
+    <!-- Selected Summary -->
+    <div class="card fade-up d2" id="selected-summary-card" style="display:none">
+      <div class="card-label"><i class="fas fa-list-check"></i> Vos produits sélectionnés</div>
+      <div id="selected-summary-content"></div>
+    </div>
+
+    <div class="nav-btns fade-up d3">
+      <button class="btn-back" onclick="goToSection(2)"><i class="fas fa-arrow-left"></i> Retour</button>
+      <button class="btn-generate" onclick="generateRoutine()">
+        <i class="fas fa-wand-magic-sparkles"></i> Générer la routine d'aujourd'hui
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4 — OUTPUT POSTER
+════════════════════════════════════════════════ -->
+<div id="section-4" class="app-section">
+  <div style="max-width:800px;margin:0 auto;padding:6rem 1.5rem 6rem;position:relative;z-index:1">
+
+    <!-- Context strip -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem;animation:fadeUp .5s ease both">
+      <div style="display:flex;align-items:center;gap:.6rem">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--sage)"></div>
+        <span style="font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--warm-gray)">Routine générée pour aujourd'hui</span>
+      </div>
+      <div style="display:flex;gap:.45rem;flex-wrap:wrap" id="context-chips"></div>
+    </div>
+
+    <!-- Poster Card -->
+    <div class="card" style="padding:0;overflow:hidden" id="poster-card">
+
+      <div class="poster-header">
+        <div class="poster-kicker"><span class="live-dot"></span> Skincare Copilot · Routine Quotidienne</div>
+        <div class="poster-title">Votre routine contextuelle<br><em>pour aujourd'hui</em></div>
+        <div class="poster-meta" id="poster-meta"></div>
+        <div class="poster-skin-tags" id="poster-skin-tags"></div>
+      </div>
+
+      <!-- Skin Analysis -->
+      <div class="skin-analysis" id="skin-analysis"></div>
+
+      <!-- Alert -->
+      <div id="alert-section"></div>
+
+      <!-- Routine Columns -->
+      <div class="routine-grid">
+        <div class="routine-col">
+          <div class="routine-col-hd">
+            <div class="time-badge am-badge"><i class="fas fa-sun"></i></div>
+            <div><div class="rcol-title">Matin</div><div class="rcol-sub">Routine AM</div></div>
+          </div>
+          <div class="step-list" id="am-steps"></div>
+        </div>
+        <div class="routine-col">
+          <div class="routine-col-hd">
+            <div class="time-badge pm-badge"><i class="fas fa-moon"></i></div>
+            <div><div class="rcol-title">Soir</div><div class="rcol-sub">Routine PM</div></div>
+          </div>
+          <div class="step-list" id="pm-steps"></div>
+        </div>
+      </div>
+
+      <!-- Gaps -->
+      <div id="gaps-section"></div>
+
+      <!-- Brand Rec -->
+      <div class="brand-rec">
+        <div style="display:flex;gap:1rem;align-items:center">
+          <div class="brand-rec-swatch"><i class="fas fa-flask-vial"></i></div>
+          <div>
+            <div class="brand-rec-label">Selon le contexte du jour, nous recommandons d'ajouter</div>
+            <div class="brand-rec-name" id="rec-product-name">Embryolisse Lait-Crème Concentré</div>
+            <div class="brand-rec-desc" id="rec-product-desc">Rich yet non-greasy hydration · perfect for cold, dry Nantes winters</div>
+          </div>
+        </div>
+        <a href="#" id="rec-amazon-link" target="_blank" class="shop-btn" onclick="return openAmazon(event)">
+          <i class="fas fa-brands fa-amazon" style="font-size:.75rem"></i> Acheter sur Amazon
+        </a>
+      </div>
+
+      <div class="poster-footer">
+        <div class="footer-brand">Créé par <strong>Skincare Copilot</strong></div>
+        <button class="reset-btn" onclick="resetApp()"><i class="fas fa-arrow-left" style="font-size:.65rem"></i> Retour à l'armoire</button>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:.68rem;color:var(--warm-gray);margin-top:1.5rem">
+      <i class="fas fa-circle-info"></i> Skincare Copilot est un outil informatif, non un substitut à un avis dermatologique.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════ -->
+<script>
+// ─── STATE ──────────────────────────────────────────────
+const STATE = {
+  skinTypes: new Set(['dry']),
+  concerns: new Set(['barrier']),
+  todayStatus: new Set(['dry_deh']),   // multi-select
+  selectedProducts: new Set(),
+};
+
+const ENV = { temp:'14°C', uv:'Moderate', humidity:40, location:'Nantes' };
+
+// ─── TRANSLATIONS ───────────────────────────────────────
+const T = {
+  js_skin_type: 'Type de peau',
+  js_concerns: 'Préoccupations',
+  js_today_status: 'Statut du jour',
+  js_profile_summary: 'Résumé de votre profil cutané',
+  js_missing: 'Manquant dans votre armoire',
+  js_alert_label: 'Alerte Skincare Copilot',
+  js_alert_body: 'Utiliser du Rétinol et des AHA/BHA la même nuit risque d\'endommager la barrière cutanée. Nous avons planifié le Rétinol ce soir et retiré l\'exfoliant. Alternez les soirs.',
+  js_compatible: '✓ Compatible avec votre profil',
+  js_review: '⚠ Veuillez examiner les points suivants',
+  js_skin_match: 'Correspondance avec votre profil :',
+  js_ing_recommended: 'Recommandé',
+  js_ing_caution: 'À utiliser avec précaution',
+  js_ing_avoid: 'À éviter pour votre peau',
+  js_ing_note_rec: '— recommandé',
+  js_ing_note_caut: '— à utiliser avec précaution',
+  js_ing_note_avoid: '— à éviter',
+  js_brand_click: 'Cliquer pour parcourir',
+  js_brand_products: 'produits',
+  js_brand_classic: 'classique',
+  js_brand_new: 'nouveau',
+  js_badge_new: 'NOUVEAU',
+  js_badge_classic: '★ Classique',
+  js_ing_panel_title: 'Ingrédients clés',
+  js_meili: 'Meili Diary',
+  js_ing_tooltip: 'Voir les ingrédients',
+  js_selected_note: 'Les éléments signalés ont des préoccupations d\'ingrédients pour votre profil — nous les traiterons dans la routine.',
+  js_apply_damp: 'Appliquer sur peau humide',
+  js_overnight: 'Liaison d\'humidité nocturne',
+  js_barrier_seal: 'Sceau barrière',
+  js_overnight_rec: 'Récupération nocturne',
+  js_uv_reapply: 'Réappliquer toutes les 2h en extérieur',
+  js_spf_gap: 'Ajouté depuis les recommandations — absent de votre armoire',
+  js_retinol_note: 'Commencer 2×/semaine · Utilisation PM uniquement',
+  js_exfol_inactive: '★ Nuits alternées uniquement — pas ce soir (Rétinol programmé)',
+  js_exfol_note: '2–3 fois par semaine maximum',
+  js_cleanse_note: 'Rincer à l\'eau tiède',
+  js_dblcleanse: 'Double nettoyage',
+  js_dblcleanse_note: 'Élimine le FPS et les impuretés en profondeur',
+  js_ha_gap: 'Humidité faible ({h}%) + peau sèche : l\'HA prévient la perte en eau.',
+  js_moist_gap_dry: 'Air froid et sec : une crème riche prévient la TEWL toute la journée.',
+  js_moist_gap: 'Scellés vos couches de sérum avec une crème hydratante.',
+  js_spf_gap_note: 'UV {uv} aujourd\'hui · Réappliquer toutes les 2h en ext.',
+  js_spf_gap_reason: 'UV {uv}{extra} — le FPS est indispensable.',
+  js_spf_extra: ' + les actifs augmentent la photosensibilité',
+  js_antioxidant: 'Antioxydant & éclat',
+  js_pore_control: 'Réduction des pores, contrôle du sébum',
+  js_barrier_repair: 'Réparation de la barrière',
+  tsd_dry_deh: 'Sèche & Déshydratée',
+  tsd_oily_con: 'Grasse & Congestionnée',
+  tsd_sensitive_red: 'Sensible & Rougie',
+  tsd_tight: 'Tendue & Stressée',
+  tsd_dull_today: 'Terne & Fatiguée',
+  tsd_breakout: 'Éruption active',
+  tsd_balanced: 'En équilibre',
+  fl_dry: 'Peau sèche',
+  fl_oily: 'Peau grasse',
+  fl_sensitive: 'Peau sensible',
+  fl_combination: 'Peau mixte',
+  fl_normal: 'Peau normale',
+  fl_acne: 'Acné',
+  fl_rosacea: 'Rosacée',
+  fl_hyperpigmentation: 'Hyperpigmentation',
+  fl_aging: 'Vieillissement',
+  fl_dehydration: 'Déshydratation',
+  fl_barrier: 'Barrière altérée',
+  fl_pores: 'Pores dilatés',
+  fl_eczema: 'Eczéma',
+  fl_dullness: 'Teint terne',
+};
+
+// ─── INGREDIENT REFERENCE LINKS ──────────────────────────
+// Maps ingredient name → { mlxq (Meili Diary / 美丽修行), inci (INCI Decoder) }
+const ING_LINKS = {
+  'Niacinamide':        { mlxq:'https://www.meiliuxing.com/ingredients/niacinamide', inci:'https://incidecoder.com/ingredients/niacinamide', label:'Niacinamide' },
+  'Retinol':            { mlxq:'https://www.meiliuxing.com/ingredients/retinol',     inci:'https://incidecoder.com/ingredients/retinol',     label:'Retinol' },
+  'Glycolic Acid':      { mlxq:'https://www.meiliuxing.com/ingredients/glycolic-acid', inci:'https://incidecoder.com/ingredients/glycolic-acid', label:'Glycolic Acid' },
+  'Salicylic Acid':     { mlxq:'https://www.meiliuxing.com/ingredients/salicylic-acid', inci:'https://incidecoder.com/ingredients/salicylic-acid', label:'Salicylic Acid' },
+  'Hyaluronic Acid':    { mlxq:'https://www.meiliuxing.com/ingredients/hyaluronic-acid', inci:'https://incidecoder.com/ingredients/sodium-hyaluronate', label:'Hyaluronic Acid' },
+  'Sodium Hyaluronate': { mlxq:'https://www.meiliuxing.com/ingredients/hyaluronic-acid', inci:'https://incidecoder.com/ingredients/sodium-hyaluronate', label:'Sodium Hyaluronate' },
+  'Ceramide':           { mlxq:'https://www.meiliuxing.com/ingredients/ceramide',    inci:'https://incidecoder.com/ingredients/ceramide-np', label:'Ceramide' },
+  'Ascorbic Acid':      { mlxq:'https://www.meiliuxing.com/ingredients/vitamin-c',   inci:'https://incidecoder.com/ingredients/ascorbic-acid', label:'Vitamin C' },
+  'Panthenol':          { mlxq:'https://www.meiliuxing.com/ingredients/panthenol',   inci:'https://incidecoder.com/ingredients/panthenol', label:'Panthenol (B5)' },
+  'Squalane':           { mlxq:'https://www.meiliuxing.com/ingredients/squalane',    inci:'https://incidecoder.com/ingredients/squalane', label:'Squalane' },
+  'Adenosine':          { mlxq:'https://www.meiliuxing.com/ingredients/adenosine',   inci:'https://incidecoder.com/ingredients/adenosine', label:'Adenosine' },
+  'Bifida Ferment':     { mlxq:'https://www.meiliuxing.com/ingredients/bifida-ferment-lysate', inci:'https://incidecoder.com/ingredients/bifida-ferment-lysate', label:'Bifida Ferment' },
+  'Vitamin E':          { mlxq:'https://www.meiliuxing.com/ingredients/tocopherol',  inci:'https://incidecoder.com/ingredients/tocopherol', label:'Vitamin E' },
+  'Ferulic Acid':       { mlxq:'https://www.meiliuxing.com/ingredients/ferulic-acid', inci:'https://incidecoder.com/ingredients/ferulic-acid', label:'Ferulic Acid' },
+  'Madecassoside':      { mlxq:'https://www.meiliuxing.com/ingredients/madecassoside', inci:'https://incidecoder.com/ingredients/madecassoside', label:'Madecassoside' },
+  'Zinc PCA':           { mlxq:'https://www.meiliuxing.com/ingredients/zinc-pca',    inci:'https://incidecoder.com/ingredients/zinc-pca', label:'Zinc PCA' },
+  'Lactic Acid':        { mlxq:'https://www.meiliuxing.com/ingredients/lactic-acid', inci:'https://incidecoder.com/ingredients/lactic-acid', label:'Lactic Acid' },
+  'Peptides':           { mlxq:'https://www.meiliuxing.com/ingredients/peptides',    inci:'https://incidecoder.com/ingredients/palmitoyl-pentapeptide-4', label:'Peptides' },
+  'Oxybenzone':         { mlxq:'https://www.meiliuxing.com/ingredients/benzophenone-3', inci:'https://incidecoder.com/ingredients/benzophenone-3', label:'Oxybenzone ⚠' },
+};
+
+function ingLink(name) {
+  for(const key in ING_LINKS) {
+    if(name.includes(key)) return ING_LINKS[key];
+  }
+  return null;
+}
+
+// ─── PRODUCT DATABASE ────────────────────────────────────
+const PRODUCT_DB = [
+
+  // ══════════════════════════════════════════════════════
+  // 🇫🇷 LA ROCHE-POSAY (French — L'Oréal Group)
+  // ══════════════════════════════════════════════════════
+  { id:'lrp_spf', brand:'La Roche-Posay', brandOrigin:'🇫🇷 French', name:'Anthelios UVMune 400 SPF50+', category:'SPF',
+    icon:'fas fa-sun', slot:'protect', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=La+Roche-Posay+Anthelios+UVMune+400+SPF50',
+    keyIngredients:[
+      { name:'Mexoryl 400 (UVA filter)', effect:'good',    note:'Broad-spectrum photostable UVA filter — EU exclusive' },
+      { name:'Tinosorb S',               effect:'good',    note:'EU-approved broad-spectrum, reef-safe' },
+      { name:'Thermal Spring Water',     effect:'good',    note:'La Roche-Posay spring water — soothing, anti-irritant' },
+    ],
+    goodFor:['sensitive','rosacea','dry','normal'], badFor:[], conflictsWith:[],
+    inciSearch:'la-roche-posay-anthelios-uvmune-400-spf50'
+  },
+  { id:'lrp_cicaplast', brand:'La Roche-Posay', brandOrigin:'🇫🇷 French', name:'Cicaplast Baume B5+', category:'Repair Balm',
+    icon:'fas fa-shield', slot:'moisturise_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=La+Roche-Posay+Cicaplast+Baume+B5',
+    keyIngredients:[
+      { name:'Panthenol (Vit B5)',    effect:'good',    note:'Accelerates skin repair, anti-inflammatory' },
+      { name:'Madecassoside',         effect:'good',    note:'Centella asiatica extract — powerful soothing' },
+      { name:'Ceramide Fraction',     effect:'good',    note:'Barrier restoration' },
+    ],
+    goodFor:['eczema','barrier','rosacea','sensitive','dry'], badFor:[], conflictsWith:[],
+    inciSearch:'la-roche-posay-cicaplast-baume-b5'
+  },
+  { id:'lrp_effaclar', brand:'La Roche-Posay', brandOrigin:'🇫🇷 French', name:'Effaclar Duo+ SPF30', category:'Moisturiser+SPF',
+    icon:'fas fa-circle-dot', slot:'moisturise_am', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=La+Roche-Posay+Effaclar+Duo+SPF30',
+    keyIngredients:[
+      { name:'Niacinamide',       effect:'good',    note:'Regulates oil, fades marks' },
+      { name:'Salicylic Acid',    effect:'good',    note:'Unclogs pores, prevents breakouts' },
+      { name:'Zinc PCA',          effect:'good',    note:'Sebum control, anti-bacterial' },
+    ],
+    goodFor:['acne','pores','oily','combination'], badFor:['dry','eczema'], conflictsWith:[],
+    inciSearch:'la-roche-posay-effaclar-duo'
+  },
+  { id:'lrp_toleriane', brand:'La Roche-Posay', brandOrigin:'🇫🇷 French', name:'Toleriane Hydrating Gentle Cleanser', category:'Cleanser',
+    icon:'fas fa-soap', slot:'cleanse', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=La+Roche-Posay+Toleriane+Hydrating+Cleanser',
+    keyIngredients:[
+      { name:'Sodium Hyaluronate', effect:'good',    note:'Maintains hydration during cleansing' },
+      { name:'Ceramide',           effect:'good',    note:'Barrier protection' },
+      { name:'Glycerin',           effect:'good',    note:'Humectant, gentle' },
+    ],
+    goodFor:['sensitive','dry','rosacea','eczema','barrier'], badFor:[], conflictsWith:[],
+    inciSearch:'la-roche-posay-toleriane-hydrating-gentle-cleanser'
+  },
+  { id:'lrp_serum_b3', brand:'La Roche-Posay', brandOrigin:'🇫🇷 French', name:'Vitamin B3 Serum 10% Niacinamide', category:'Serum',
+    icon:'fas fa-vial', slot:'treat_am_or_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=La+Roche-Posay+Vitamin+B3+Serum+Niacinamide',
+    keyIngredients:[
+      { name:'Niacinamide',       effect:'good',    note:'10% — clinically proven pore reduction' },
+      { name:'Hyaluronic Acid',   effect:'good',    note:'Dual-weight hydration' },
+      { name:'Zinc PCA',          effect:'good',    note:'Controls shine, anti-acne' },
+    ],
+    goodFor:['acne','pores','oily','hyperpigmentation','combination'], badFor:[], conflictsWith:[],
+    inciSearch:'la-roche-posay-vitamin-b3-serum'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🇫🇷 VICHY (French — L'Oréal Group)
+  // ══════════════════════════════════════════════════════
+  { id:'vi_minéral', brand:'Vichy', brandOrigin:'🇫🇷 French', name:'Minéral 89 Hyaluronic Acid Booster', category:'Hydration',
+    icon:'fas fa-droplet', slot:'hydrate', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Vichy+Mineral+89+Hyaluronic+Acid+Booster',
+    keyIngredients:[
+      { name:'Hyaluronic Acid',       effect:'good',    note:'15% pure HA — intense plumping' },
+      { name:'Vichy Volcanic Water',   effect:'good',    note:'15 minerals — strengthens barrier' },
+    ],
+    goodFor:['dry','dehydration','sensitive','barrier','aging'], badFor:[], conflictsWith:[],
+    inciSearch:'vichy-mineral-89'
+  },
+  { id:'vi_liftactiv', brand:'Vichy', brandOrigin:'🇫🇷 French', name:'Liftactiv Supreme Anti-Aging Serum', category:'Anti-Aging Serum',
+    icon:'fas fa-hourglass-half', slot:'treat_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Vichy+Liftactiv+Supreme+Anti-Aging+Serum',
+    keyIngredients:[
+      { name:'Rhamnose',        effect:'good',    note:'Plant-derived sugar — stimulates skin renewal' },
+      { name:'Vitamin C',       effect:'good',    note:'Brightening, antioxidant' },
+      { name:'Hyaluronic Acid', effect:'good',    note:'Deep hydration' },
+    ],
+    goodFor:['aging','hyperpigmentation','dullness','dry'], badFor:['acne'], conflictsWith:[],
+    inciSearch:'vichy-liftactiv-supreme-serum'
+  },
+  { id:'vi_normaderm', brand:'Vichy', brandOrigin:'🇫🇷 French', name:'Normaderm Probio-BHA Serum', category:'Serum',
+    icon:'fas fa-vial', slot:'treat_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Vichy+Normaderm+Probio-BHA+Serum',
+    keyIngredients:[
+      { name:'Salicylic Acid',  effect:'good',    note:'0.5% BHA — gentle daily exfoliation' },
+      { name:'Niacinamide',     effect:'good',    note:'Sebum control, anti-inflammatory' },
+      { name:'Bifida Ferment',  effect:'good',    note:'Probiotic — strengthens microbiome' },
+    ],
+    goodFor:['acne','pores','oily','combination'], badFor:['sensitive','rosacea'], conflictsWith:['to_retinol'],
+    inciSearch:'vichy-normaderm-probio-bha-serum'
+  },
+  { id:'vi_capital', brand:'Vichy', brandOrigin:'🇫🇷 French', name:'Capital Soleil UV-Age Daily SPF50+', category:'SPF',
+    icon:'fas fa-sun', slot:'protect', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Vichy+Capital+Soleil+UV-Age+Daily+SPF50',
+    keyIngredients:[
+      { name:'Mexoryl 400',         effect:'good',    note:'Anti-aging UVA shield' },
+      { name:'Niacinamide',         effect:'good',    note:'Reduces dark spots triggered by UV' },
+      { name:'Hyaluronic Acid',     effect:'good',    note:'Hydrating, tinted formula available' },
+    ],
+    goodFor:['aging','hyperpigmentation','dry','sensitive'], badFor:[], conflictsWith:[],
+    inciSearch:'vichy-capital-soleil-uv-age-daily'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🇫🇷 AVÈNE (French — Pierre Fabre Group)
+  // ══════════════════════════════════════════════════════
+  { id:'av_cream', brand:'Avène', brandOrigin:'🇫🇷 French', name:'Skin Recovery Cream Rich', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Av%C3%A8ne+Skin+Recovery+Cream',
+    keyIngredients:[
+      { name:'Avène Thermal Spring Water', effect:'good', note:'Patented soothing water, anti-irritant' },
+      { name:'Pre-tocopheryl (Vit E)',      effect:'good', note:'Antioxidant, barrier repair' },
+      { name:'Glycerin',                    effect:'good', note:'Deep humectant' },
+    ],
+    goodFor:['sensitive','rosacea','eczema','barrier','dry'], badFor:['acne','oily'], conflictsWith:[],
+    inciSearch:'avene-skin-recovery-cream'
+  },
+  { id:'av_cicalfate', brand:'Avène', brandOrigin:'🇫🇷 French', name:'Cicalfate+ Restorative Protective Cream', category:'Repair Balm',
+    icon:'fas fa-shield', slot:'moisturise_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Av%C3%A8ne+Cicalfate+Cream',
+    keyIngredients:[
+      { name:'Sucralfate',                  effect:'good', note:'Repairs skin barrier, anti-bacterial' },
+      { name:'Avène Thermal Spring Water', effect:'good', note:'Reduces skin reactivity' },
+      { name:'Zinc',                        effect:'good', note:'Heals irritation, anti-microbial' },
+    ],
+    goodFor:['eczema','barrier','sensitive','rosacea','dry'], badFor:[], conflictsWith:[],
+    inciSearch:'avene-cicalfate-restorative-cream'
+  },
+  { id:'av_cleanance', brand:'Avène', brandOrigin:'🇫🇷 French', name:'Cleanance Comedomed Anti-Blemish Concentrate', category:'Serum',
+    icon:'fas fa-vial', slot:'treat_pm', isNew:false, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Avene+Cleanance+Comedomed',
+    keyIngredients:[
+      { name:'Monolaurin',       effect:'good',    note:'Anti-bacterial, reduces P. acnes' },
+      { name:'Glycolic Acid',    effect:'caution', note:'Mild AHA — avoid with Retinol same night' },
+      { name:'Salicylic Acid',   effect:'good',    note:'Pore-clearing BHA' },
+    ],
+    goodFor:['acne','pores','oily','combination'], badFor:['sensitive','rosacea','eczema','barrier'], conflictsWith:['to_retinol'],
+    inciSearch:'avene-cleanance-comedomed'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🇫🇷 L'ORÉAL PARIS (French)
+  // ══════════════════════════════════════════════════════
+  { id:'lo_revitalift', brand:"L'Oréal Paris", brandOrigin:'🇫🇷 French', name:'Revitalift 1.5% Pure Hyaluronic Acid Serum', category:'Hydration',
+    icon:'fas fa-droplet', slot:'hydrate', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=LOreal+Revitalift+1.5+Hyaluronic+Acid+Serum',
+    keyIngredients:[
+      { name:'Sodium Hyaluronate', effect:'good',    note:'1.5% triple-weight HA — surface + deep layers' },
+      { name:'Hyaluronic Acid',    effect:'good',    note:'Plumps fine lines immediately' },
+    ],
+    goodFor:['dry','dehydration','aging','barrier','sensitive'], badFor:[], conflictsWith:[],
+    inciSearch:'loreal-revitalift-pure-hyaluronic-acid-serum'
+  },
+  { id:'lo_glycolic', brand:"L'Oréal Paris", brandOrigin:'🇫🇷 French', name:'Revitalift 5% Glycolic Acid Peeling Toner', category:'Exfoliant',
+    icon:'fas fa-flask', slot:'treat_pm_weekly', isNew:false, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=LOreal+Revitalift+Glycolic+Acid+Toner',
+    keyIngredients:[
+      { name:'Glycolic Acid',  effect:'caution', note:'5% AHA — resurfaces, brightens' },
+      { name:'Aloe Vera',      effect:'good',    note:'Soothes post-exfoliation' },
+    ],
+    goodFor:['hyperpigmentation','dullness','aging','pores'], badFor:['rosacea','sensitive','eczema'], conflictsWith:['to_retinol'],
+    inciSearch:'loreal-revitalift-glycolic-acid-toner'
+  },
+  { id:'lo_spf', brand:"L'Oréal Paris", brandOrigin:'🇫🇷 French', name:'UV Defender Serum Protector SPF50+', category:'SPF',
+    icon:'fas fa-sun', slot:'protect', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=LOreal+UV+Defender+Serum+Protector+SPF50',
+    keyIngredients:[
+      { name:'Mexoryl 400',     effect:'good',    note:'Broad spectrum, anti-UVA Long' },
+      { name:'Niacinamide',     effect:'good',    note:'Prevents UV-induced dark spots' },
+      { name:'Vitamin E',       effect:'good',    note:'Antioxidant booster' },
+    ],
+    goodFor:['hyperpigmentation','aging','normal','combination'], badFor:[], conflictsWith:[],
+    inciSearch:'loreal-uv-defender-serum-spf50'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 💄 LANCÔME (French — L'Oréal Luxe)
+  // ══════════════════════════════════════════════════════
+  { id:'lc_genifique', brand:'Lancôme', brandOrigin:'🇫🇷 French Luxury', name:'Advanced Génifique Youth Activating Serum', category:'Anti-Aging Serum',
+    icon:'fas fa-star', slot:'treat_am_or_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Lancome+Advanced+Genifique+Serum',
+    keyIngredients:[
+      { name:'Bifida Ferment',  effect:'good',    note:'Prebiotic — strengthens microbiome, anti-aging' },
+      { name:'Hyaluronic Acid', effect:'good',    note:'Multi-weight — plumps & smooths' },
+      { name:'Vitamin C',       effect:'good',    note:'Brightens, antioxidant protection' },
+    ],
+    goodFor:['aging','dullness','dry','barrier','sensitive'], badFor:[], conflictsWith:[],
+    inciSearch:'lancome-advanced-genifique-serum'
+  },
+  { id:'lc_absolue', brand:'Lancôme', brandOrigin:'🇫🇷 French Luxury', name:'Absolue Soft Cream Grand Rose Extract', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Lancome+Absolue+Soft+Cream',
+    keyIngredients:[
+      { name:'Grand Rose Extract', effect:'good',    note:'Centifolia Rose — regenerates, firms' },
+      { name:'Peptides',           effect:'good',    note:'Pro-Xylane — restructures collagen' },
+      { name:'Hyaluronic Acid',    effect:'good',    note:'Deep moisture reservoir' },
+    ],
+    goodFor:['aging','dry','dullness','hyperpigmentation'], badFor:['acne','oily'], conflictsWith:[],
+    inciSearch:'lancome-absolue-soft-cream'
+  },
+  { id:'lc_clarifique', brand:'Lancôme', brandOrigin:'🇫🇷 French Luxury', name:'Clarifique Dual Essence (New 2024)', category:'Serum',
+    icon:'fas fa-vial', slot:'treat_am_or_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Lancome+Clarifique+Dual+Essence',
+    keyIngredients:[
+      { name:'Bifida Ferment',  effect:'good',    note:'Microbiome-balancing probiotic' },
+      { name:'Niacinamide',     effect:'good',    note:'Brightening, pore-refining' },
+      { name:'Hyaluronic Acid', effect:'good',    note:'Hydration boost' },
+    ],
+    goodFor:['dullness','hyperpigmentation','aging','combination'], badFor:[], conflictsWith:[],
+    inciSearch:'lancome-clarifique-dual-essence'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 💎 ESTÉE LAUDER (American luxury)
+  // ══════════════════════════════════════════════════════
+  { id:'el_anewr', brand:'Estée Lauder', brandOrigin:'🇺🇸 American Luxury', name:'Advanced Night Repair Serum (ANR)', category:'Anti-Aging Serum',
+    icon:'fas fa-moon', slot:'treat_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Estee+Lauder+Advanced+Night+Repair+Serum',
+    keyIngredients:[
+      { name:'ChronoluxCB™ Technology', effect:'good', note:'Activates natural repair rhythm overnight' },
+      { name:'Bifida Ferment',          effect:'good', note:'Microbiome strengthening' },
+      { name:'Hyaluronic Acid',         effect:'good', note:'Intensive overnight hydration' },
+    ],
+    goodFor:['aging','dry','dullness','barrier','dehydration'], badFor:[], conflictsWith:[],
+    inciSearch:'estee-lauder-advanced-night-repair-serum'
+  },
+  { id:'el_dw', brand:'Estée Lauder', brandOrigin:'🇺🇸 American Luxury', name:'Double Wear Stay-in-Place Foundation', category:'Foundation',
+    icon:'fas fa-palette', slot:'makeup', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Estee+Lauder+Double+Wear+Foundation',
+    keyIngredients:[
+      { name:'SPF10 filters',  effect:'neutral', note:'Minimal UV protection only — layer SPF50 beneath' },
+      { name:'Dimethicone',    effect:'neutral', note:'Silicone — smooth application, may clog pores' },
+    ],
+    goodFor:['combination','oily','normal'], badFor:['acne','eczema'], conflictsWith:[],
+    inciSearch:'estee-lauder-double-wear-foundation'
+  },
+  { id:'el_revit', brand:'Estée Lauder', brandOrigin:'🇺🇸 American Luxury', name:'Revitalizing Supreme+ Moisturizer', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Estee+Lauder+Revitalizing+Supreme+Moisturizer',
+    keyIngredients:[
+      { name:'Moringa Extract',  effect:'good', note:'Powerful antioxidant, anti-pollution' },
+      { name:'Adenosine',        effect:'good', note:'Clinically proven anti-wrinkle' },
+      { name:'Hyaluronic Acid',  effect:'good', note:'Plumping hydration' },
+    ],
+    goodFor:['aging','dry','dullness','barrier'], badFor:['acne'], conflictsWith:[],
+    inciSearch:'estee-lauder-revitalizing-supreme-moisturizer'
+  },
+  { id:'el_anr_eye', brand:'Estée Lauder', brandOrigin:'🇺🇸 American Luxury', name:'Advanced Night Repair Eye Supercharged Complex', category:'Eye Care',
+    icon:'fas fa-eye', slot:'treat_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Estee+Lauder+Advanced+Night+Repair+Eye',
+    keyIngredients:[
+      { name:'Peptides',         effect:'good', note:'Reduces puffiness & dark circles' },
+      { name:'Hyaluronic Acid',  effect:'good', note:'Plumps under-eye area' },
+      { name:'Caffeine',         effect:'good', note:'Decongests eye area' },
+    ],
+    goodFor:['aging','dry','dehydration','dullness'], badFor:[], conflictsWith:[],
+    inciSearch:'estee-lauder-advanced-night-repair-eye'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🌹 DIOR BEAUTY (French Luxury — LVMH)
+  // ══════════════════════════════════════════════════════
+  { id:'di_capture', brand:'Dior Beauty', brandOrigin:'🇫🇷 French Luxury', name:'Capture Totale Super Potent Serum', category:'Anti-Aging Serum',
+    icon:'fas fa-star', slot:'treat_am_or_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Dior+Capture+Totale+Super+Potent+Serum',
+    keyIngredients:[
+      { name:'Longoza Flower Extract', effect:'good', note:'Dior exclusive — stimulates repair' },
+      { name:'Hyaluronic Acid',        effect:'good', note:'3 types — surface to deep hydration' },
+      { name:'Peptides',               effect:'good', note:'Firms, lifts' },
+    ],
+    goodFor:['aging','dry','dullness','barrier'], badFor:[], conflictsWith:[],
+    inciSearch:'dior-capture-totale-super-potent-serum'
+  },
+  { id:'di_prestige', brand:'Dior Beauty', brandOrigin:'🇫🇷 French Luxury', name:'Prestige La Crème — La Micro-Huile de Rose', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Dior+Prestige+La+Creme+Rose',
+    keyIngredients:[
+      { name:'Granville Rose Micro-Droplets', effect:'good', note:'Dior-exclusive regenerating rose oil' },
+      { name:'Hyaluronic Acid',               effect:'good', note:'Plumping moisture' },
+      { name:'Squalane',                       effect:'good', note:'Non-comedogenic, luxurious' },
+    ],
+    goodFor:['aging','dry','dullness','sensitive'], badFor:['acne','oily'], conflictsWith:[],
+    inciSearch:'dior-prestige-la-creme'
+  },
+  { id:'di_one', brand:'Dior Beauty', brandOrigin:'🇫🇷 French Luxury', name:'One Essential Skin Boosting Super Serum (2024)', category:'Serum',
+    icon:'fas fa-vial', slot:'treat_am_or_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Dior+One+Essential+Skin+Boosting+Serum',
+    keyIngredients:[
+      { name:'Turmeric Extract',  effect:'good',    note:'Anti-pollution, detoxifying' },
+      { name:'Bifida Ferment',    effect:'good',    note:'Microbiome support, anti-aging' },
+      { name:'Hyaluronic Acid',   effect:'good',    note:'Intense hydration' },
+    ],
+    goodFor:['aging','dullness','hyperpigmentation','barrier'], badFor:[], conflictsWith:[],
+    inciSearch:'dior-one-essential-serum'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🌿 CHANEL BEAUTÉ (French Luxury)
+  // ══════════════════════════════════════════════════════
+  { id:'ch_hydra', brand:'Chanel Beauté', brandOrigin:'🇫🇷 French Luxury', name:'Hydra Beauty Micro Sérum Intense Replenishing Hydration', category:'Hydration',
+    icon:'fas fa-droplet', slot:'hydrate', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Chanel+Hydra+Beauty+Micro+Serum',
+    keyIngredients:[
+      { name:'Blue Ginger Extract',  effect:'good', note:'Chanel exclusive — deep cellular hydration' },
+      { name:'Hyaluronic Acid',      effect:'good', note:'Micro-droplet delivery system' },
+      { name:'Vitamin E',            effect:'good', note:'Antioxidant protection' },
+    ],
+    goodFor:['dry','dehydration','barrier','aging','sensitive'], badFor:[], conflictsWith:[],
+    inciSearch:'chanel-hydra-beauty-micro-serum'
+  },
+  { id:'ch_n1', brand:'Chanel Beauté', brandOrigin:'🇫🇷 French Luxury', name:'N°1 de CHANEL Red Camellia Revitalizing Serum (2023)', category:'Anti-Aging Serum',
+    icon:'fas fa-star', slot:'treat_am_or_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Chanel+N1+de+Chanel+Red+Camellia+Serum',
+    keyIngredients:[
+      { name:'Red Camellia Extract', effect:'good', note:'Chanel exclusive — polyphenols, anti-aging' },
+      { name:'Adenosine',            effect:'good', note:'Reduces wrinkle depth' },
+      { name:'Hyaluronic Acid',      effect:'good', note:'Multi-weight hydration' },
+    ],
+    goodFor:['aging','dullness','dry','sensitive'], badFor:[], conflictsWith:[],
+    inciSearch:'chanel-n1-red-camellia-serum'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 💧 SHISEIDO (Japanese — international classic)
+  // ══════════════════════════════════════════════════════
+  { id:'sh_ultimune', brand:'Shiseido', brandOrigin:'🇯🇵 Japanese', name:'Ultimune Power Infusing Concentrate III', category:'Anti-Aging Serum',
+    icon:'fas fa-star', slot:'treat_am_or_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Shiseido+Ultimune+Power+Infusing+Concentrate',
+    keyIngredients:[
+      { name:'ImuGeneration Technology', effect:'good', note:'Activates skin immune network' },
+      { name:'Iris Root Extract',        effect:'good', note:'Shiseido exclusive — antioxidant' },
+      { name:'Hyaluronic Acid',          effect:'good', note:'Triple-action hydration' },
+    ],
+    goodFor:['aging','dullness','barrier','sensitive','dry'], badFor:[], conflictsWith:[],
+    inciSearch:'shiseido-ultimune-power-infusing-concentrate'
+  },
+  { id:'sh_sublimic', brand:'Shiseido', brandOrigin:'🇯🇵 Japanese', name:'Vital Perfection LiftDefine Radiance Serum', category:'Anti-Aging Serum',
+    icon:'fas fa-vial', slot:'treat_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Shiseido+Vital+Perfection+LiftDefine+Serum',
+    keyIngredients:[
+      { name:'KOMBU-Extract',    effect:'good', note:'Marine biotech — firms contours' },
+      { name:'Retinol',          effect:'caution', note:'PM only, photosensitising' },
+      { name:'Vitamin C',        effect:'good', note:'Brightening, antioxidant' },
+    ],
+    goodFor:['aging','dullness','hyperpigmentation'], badFor:['sensitive','rosacea'], conflictsWith:['to_aha','pc_bha'],
+    inciSearch:'shiseido-vital-perfection-lift-define-serum'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🇰🇷 SULWHASOO (Korean Luxury)
+  // ══════════════════════════════════════════════════════
+  { id:'sw_first', brand:'Sulwhasoo', brandOrigin:'🇰🇷 Korean Luxury', name:'First Care Activating Serum VI', category:'Serum',
+    icon:'fas fa-star', slot:'treat_am_or_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Sulwhasoo+First+Care+Activating+Serum',
+    keyIngredients:[
+      { name:'JAUM Activator™',   effect:'good', note:'5 fermented medicinal herbs — skin harmony' },
+      { name:'Polygonatum Root',  effect:'good', note:'Moisture retention, anti-aging' },
+    ],
+    goodFor:['aging','dullness','dry','sensitive','barrier'], badFor:[], conflictsWith:[],
+    inciSearch:'sulwhasoo-first-care-activating-serum'
+  },
+  { id:'sw_concentrated', brand:'Sulwhasoo', brandOrigin:'🇰🇷 Korean Luxury', name:'Concentrated Ginseng Renewing Cream EX', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Sulwhasoo+Concentrated+Ginseng+Renewing+Cream',
+    keyIngredients:[
+      { name:'Ginsenoside (Ginseng)', effect:'good', note:'Anti-aging, collagen synthesis' },
+      { name:'Hyaluronic Acid',       effect:'good', note:'Intensive moisture' },
+      { name:'Peptides',              effect:'good', note:'Firming, restructuring' },
+    ],
+    goodFor:['aging','dry','dullness','barrier'], badFor:['acne'], conflictsWith:[],
+    inciSearch:'sulwhasoo-concentrated-ginseng-renewing-cream'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🧪 THE ORDINARY
+  // ══════════════════════════════════════════════════════
+  { id:'to_vitc', brand:'The Ordinary', brandOrigin:'🇨🇦 Canadian', name:'Ascorbyl Glucoside Solution 12%', category:'Vitamin C',
+    icon:'fas fa-lemon', slot:'treat_am', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=The+Ordinary+Ascorbyl+Glucoside+Solution+12',
+    keyIngredients:[
+      { name:'Ascorbic Acid',  effect:'good',    note:'Stable Vit C derivative — brightens, antioxidant' },
+      { name:'Ferulic Acid',   effect:'good',    note:'Synergistic antioxidant, stabilises Vit C' },
+    ],
+    goodFor:['hyperpigmentation','dullness','aging'], badFor:['rosacea'], conflictsWith:['to_retinol'],
+    inciSearch:'the-ordinary-ascorbyl-glucoside-solution-12'
+  },
+  { id:'to_niacin', brand:'The Ordinary', brandOrigin:'🇨🇦 Canadian', name:'Niacinamide 10% + Zinc 1%', category:'Serum',
+    icon:'fas fa-vial', slot:'treat_am_or_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=The+Ordinary+Niacinamide+10+Zinc+1',
+    keyIngredients:[
+      { name:'Niacinamide', effect:'good', note:'Reduces pores, regulates oil, evens tone' },
+      { name:'Zinc PCA',    effect:'good', note:'Controls sebum, anti-bacterial' },
+    ],
+    goodFor:['acne','pores','hyperpigmentation','oily'], badFor:[], conflictsWith:[],
+    inciSearch:'the-ordinary-niacinamide-10-zinc-1'
+  },
+  { id:'to_retinol', brand:'The Ordinary', brandOrigin:'🇨🇦 Canadian', name:'Retinol 1% in Squalane', category:'Retinol',
+    icon:'fas fa-moon', slot:'treat_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=The+Ordinary+Retinol+1+in+Squalane',
+    keyIngredients:[
+      { name:'Retinol',   effect:'caution', note:'1% — powerful but photosensitising — PM only' },
+      { name:'Squalane',  effect:'good',    note:'Hydrating non-comedogenic carrier' },
+    ],
+    goodFor:['aging','hyperpigmentation','acne'], badFor:['rosacea','sensitive','eczema'], conflictsWith:['to_aha','pc_bha','av_cleanance'],
+    inciSearch:'the-ordinary-retinol-1-in-squalane'
+  },
+  { id:'to_aha', brand:'The Ordinary', brandOrigin:'🇨🇦 Canadian', name:'AHA 30% + BHA 2% Peeling Solution', category:'Exfoliant',
+    icon:'fas fa-flask', slot:'treat_pm_weekly', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=The+Ordinary+AHA+30+BHA+2+Peeling+Solution',
+    keyIngredients:[
+      { name:'Glycolic Acid',  effect:'caution', note:'30% AHA — strong, do not combine with Retinol' },
+      { name:'Salicylic Acid', effect:'good',    note:'2% BHA — pore clearing, anti-comedogenic' },
+      { name:'Lactic Acid',    effect:'caution', note:'Exfoliates — avoid if barrier compromised' },
+    ],
+    goodFor:['acne','pores','hyperpigmentation','dullness'], badFor:['rosacea','sensitive','eczema','barrier'], conflictsWith:['to_retinol','sh_sublimic'],
+    inciSearch:'the-ordinary-aha-30-bha-2-peeling-solution'
+  },
+  { id:'to_ha', brand:'The Ordinary', brandOrigin:'🇨🇦 Canadian', name:'Hyaluronic Acid 2% + B5', category:'Hydration',
+    icon:'fas fa-droplet', slot:'hydrate', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=The+Ordinary+Hyaluronic+Acid+2+B5',
+    keyIngredients:[
+      { name:'Sodium Hyaluronate', effect:'good', note:'Multi-weight HA — draws moisture into all layers' },
+      { name:'Panthenol',          effect:'good', note:'Vit B5 — soothing, barrier support' },
+    ],
+    goodFor:['dry','dehydration','sensitive','barrier','eczema'], badFor:[], conflictsWith:[],
+    inciSearch:'the-ordinary-hyaluronic-acid-2-b5'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🏥 CERAVE (US — L'Oréal Group)
+  // ══════════════════════════════════════════════════════
+  { id:'cv_moisturiser', brand:'CeraVe', brandOrigin:'🇺🇸 American Derm', name:'Moisturising Cream', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=CeraVe+Moisturising+Cream',
+    keyIngredients:[
+      { name:'Ceramide NP, AP, EOP', effect:'good', note:'3 ceramides — restores barrier, dermatologist-recommended' },
+      { name:'Hyaluronic Acid',       effect:'good', note:'Locks in moisture' },
+      { name:'Niacinamide',           effect:'good', note:'Calming, anti-inflammatory' },
+    ],
+    goodFor:['dry','eczema','barrier','sensitive','dehydration'], badFor:[], conflictsWith:[],
+    inciSearch:'cerave-moisturising-cream'
+  },
+  { id:'cv_hydrating', brand:'CeraVe', brandOrigin:'🇺🇸 American Derm', name:'Hydrating Cleanser', category:'Cleanser',
+    icon:'fas fa-soap', slot:'cleanse', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=CeraVe+Hydrating+Cleanser',
+    keyIngredients:[
+      { name:'Ceramide',          effect:'good', note:'Cleanses without disrupting barrier' },
+      { name:'Hyaluronic Acid',   effect:'good', note:'Maintains hydration' },
+      { name:'Glycerin',          effect:'good', note:'Gentle humectant' },
+    ],
+    goodFor:['dry','sensitive','eczema','barrier','dehydration'], badFor:[], conflictsWith:[],
+    inciSearch:'cerave-hydrating-cleanser'
+  },
+  { id:'cv_foaming', brand:'CeraVe', brandOrigin:'🇺🇸 American Derm', name:'Foaming Facial Cleanser', category:'Cleanser',
+    icon:'fas fa-soap', slot:'cleanse', isNew:false, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=CeraVe+Foaming+Facial+Cleanser',
+    keyIngredients:[
+      { name:'Niacinamide', effect:'good', note:'Mild, anti-inflammatory' },
+      { name:'Ceramide',    effect:'good', note:'Maintains barrier during cleansing' },
+    ],
+    goodFor:['oily','acne','combination'], badFor:['dry','eczema'], conflictsWith:[],
+    inciSearch:'cerave-foaming-cleanser'
+  },
+  { id:'cv_sa', brand:'CeraVe', brandOrigin:'🇺🇸 American Derm', name:'SA Smoothing Cream (Salicylic Acid)', category:'Moisturiser',
+    icon:'fas fa-jar', slot:'moisturise', isNew:false, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=CeraVe+SA+Smoothing+Cream',
+    keyIngredients:[
+      { name:'Salicylic Acid',   effect:'good',    note:'Exfoliates dead skin — especially for keratosis pilaris' },
+      { name:'Ceramide',         effect:'good',    note:'Barrier repair while exfoliating' },
+      { name:'Hyaluronic Acid',  effect:'good',    note:'Hydration' },
+    ],
+    goodFor:['acne','pores','oily','combination'], badFor:['eczema','sensitive'], conflictsWith:['to_retinol'],
+    inciSearch:'cerave-sa-smoothing-cream'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🌿 PAULA'S CHOICE (US)
+  // ══════════════════════════════════════════════════════
+  { id:'pc_bha', brand:"Paula's Choice", brandOrigin:'🇺🇸 American', name:'Skin Perfecting 2% BHA Liquid', category:'Exfoliant',
+    icon:'fas fa-vial', slot:'treat_pm', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Paula%27s+Choice+Skin+Perfecting+2+BHA+Liquid',
+    keyIngredients:[
+      { name:'Salicylic Acid',       effect:'good',    note:'2% — penetrates deep into pores' },
+      { name:'Methylpropanediol',    effect:'neutral', note:'Penetration enhancer' },
+    ],
+    goodFor:['acne','pores','oily','combination','hyperpigmentation'], badFor:['rosacea','sensitive','eczema'], conflictsWith:['to_retinol'],
+    inciSearch:'paulas-choice-skin-perfecting-2-bha-liquid'
+  },
+  { id:'pc_vitc', brand:"Paula's Choice", brandOrigin:'🇺🇸 American', name:'C15 Super Booster', category:'Vitamin C',
+    icon:'fas fa-lemon', slot:'treat_am', isNew:false, isClassic:true,
+    amazon:'https://www.amazon.com/s?k=Paula%27s+Choice+C15+Super+Booster',
+    keyIngredients:[
+      { name:'Ascorbic Acid', effect:'good',    note:'15% pure Vit C — maximum brightening' },
+      { name:'Vitamin E',     effect:'good',    note:'Synergistic antioxidant' },
+      { name:'Ferulic Acid',  effect:'good',    note:'Stabilises Vit C, boosts efficacy' },
+    ],
+    goodFor:['hyperpigmentation','aging','dullness'], badFor:['rosacea','sensitive'], conflictsWith:['to_retinol','pc_bha'],
+    inciSearch:'paulas-choice-c15-super-booster'
+  },
+  { id:'pc_peptide', brand:"Paula's Choice", brandOrigin:'🇺🇸 American', name:'Peptide Booster', category:'Anti-Aging Serum',
+    icon:'fas fa-star', slot:'treat_am_or_pm', isNew:false, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=Paula%27s+Choice+Peptide+Booster',
+    keyIngredients:[
+      { name:'Peptides',        effect:'good', note:'Multiple peptide complex — firms, reduces wrinkles' },
+      { name:'Adenosine',       effect:'good', note:'Energises cells, anti-aging' },
+      { name:'Vitamin E',       effect:'good', note:'Antioxidant protection' },
+    ],
+    goodFor:['aging','dry','dullness','barrier'], badFor:[], conflictsWith:[],
+    inciSearch:'paulas-choice-peptide-booster'
+  },
+
+  // ══════════════════════════════════════════════════════
+  // 🇬🇧 THE INKEY LIST (British)
+  // ══════════════════════════════════════════════════════
+  { id:'ti_retinal', brand:'The INKEY List', brandOrigin:'🇬🇧 British', name:'Retinal 0.1% Eye Cream', category:'Eye Care',
+    icon:'fas fa-eye', slot:'treat_pm', isNew:true, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=The+Inkey+List+Retinal+Eye+Cream',
+    keyIngredients:[
+      { name:'Retinol',         effect:'caution', note:'Retinal (11x stronger than retinol) — PM only' },
+      { name:'Peptides',        effect:'good',    note:'De-puffs, reduces dark circles' },
+      { name:'Hyaluronic Acid', effect:'good',    note:'Cushions delicate eye skin' },
+    ],
+    goodFor:['aging','dullness'], badFor:['sensitive','rosacea','eczema'], conflictsWith:['to_aha','pc_bha'],
+    inciSearch:'the-inkey-list-retinal-eye-cream'
+  },
+  { id:'ti_spf', brand:'The INKEY List', brandOrigin:'🇬🇧 British', name:'Daily SPF Moisturiser SPF30', category:'SPF',
+    icon:'fas fa-sun', slot:'protect', isNew:false, isClassic:false,
+    amazon:'https://www.amazon.com/s?k=The+Inkey+List+Daily+SPF+Moisturiser',
+    keyIngredients:[
+      { name:'Zinc Oxide',       effect:'good',    note:'Mineral filter — ideal for sensitive/rosacea' },
+      { name:'Hyaluronic Acid',  effect:'good',    note:'Hydrating finish' },
+    ],
+    goodFor:['sensitive','rosacea','dry','normal'], badFor:[], conflictsWith:[],
+    inciSearch:'the-inkey-list-daily-spf-moisturiser'
+  },
+];
+
+// Group by brand
+const BRANDS = [...new Set(PRODUCT_DB.map(p=>p.brand))];
+
+// ─── INGREDIENT COMPATIBILITY ─────────────────────────────
+function getCompatibility(product) {
+  const types = STATE.skinTypes;
+  const concerns = STATE.concerns;
+  const good = [], warn = [], bad = [];
+  
+  // Check goodFor
+  product.goodFor.forEach(g => {
+    if(types.has(g) || concerns.has(g)) good.push(`✓ Good for ${formatLabel(g)}`);
+  });
+  // Check badFor
+  product.badFor.forEach(b => {
+    if(types.has(b) || concerns.has(b)) bad.push(`✗ Avoid with ${formatLabel(b)}`);
+  });
+  // Check conflicts
+  product.conflictsWith.forEach(c => {
+    if(STATE.selectedProducts.has(c)) warn.push(`⚠ Conflicts with ${PRODUCT_DB.find(p=>p.id===c)?.name||c}`);
+  });
+
+  if(bad.length) return { level:'bad', messages:[...bad,...warn,...good] };
+  if(warn.length) return { level:'warn', messages:[...warn,...good] };
+  return { level:'good', messages: good.length ? good : ['Compatible with your profile'] };
+}
+
+function formatLabel(s){
+  const map={dry:'Peau sèche',oily:'Peau grasse',sensitive:'Peau sensible',combination:'Peau mixte',normal:'Peau normale',
+    acne:'Acné',rosacea:'Rosacée',hyperpigmentation:'Hyperpigmentation',aging:'Vieillissement',dehydration:'Déshydratation',
+    barrier:'Barrière altérée',pores:'Pores dilatés',eczema:'Eczéma',dullness:'Teint terne'};
+  return map[s]||s;
+}
+
+// ─── RENDER CABINET ──────────────────────────────────────
+function renderCabinet(){
+  const container = document.getElementById('cabinet-container');
+  container.innerHTML='';
+  BRANDS.forEach(brand=>{
+    const products = PRODUCT_DB.filter(p=>p.brand===brand);
+    const origin   = products[0]?.brandOrigin || '';
+    const newCount = products.filter(p=>p.isNew).length;
+    const classicCount = products.filter(p=>p.isClassic).length;
+    const metaParts = [
+      `${products.length} products`,
+      classicCount ? `★ ${classicCount} classic` : '',
+      newCount     ? `✦ ${newCount} new` : '',
+    ].filter(Boolean).join(' · ');
+    const wrap = document.createElement('div');
+    wrap.className='brand-accordion';
+    wrap.innerHTML=`
+      <div class="brand-header" onclick="toggleBrand(this)">
+        <div>
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+            <div class="brand-name">${brand}</div>
+            ${origin?`<span style="font-size:.6rem;color:var(--warm-gray);border:1px solid var(--beige);border-radius:99px;padding:.1rem .5rem">${origin}</span>`:''}
+          </div>
+          <div class="brand-meta">${metaParts} · Cliquer pour parcourir</div>
+        </div>
+        <i class="fas fa-chevron-down brand-chevron"></i>
+      </div>
+      <div class="brand-products" id="bp-${brand.replace(/\W/g,'_')}">
+        ${products.map(p=>renderProductChip(p)).join('')}
+      </div>`;
+    container.appendChild(wrap);
+  });
+}
+
+function renderProductChip(p){
+  const compat = getCompatibility(p);
+  const compatColor = {good:'var(--green)',warn:'#B45309',bad:'var(--red)'}[compat.level];
+  const compatIcon  = {good:'fa-check-circle',warn:'fa-triangle-exclamation',bad:'fa-times-circle'}[compat.level];
+  const newBadge    = p.isNew    ? `<span style="font-size:.55rem;background:#E8F4FD;color:#1A6FA5;border-radius:3px;padding:.08rem .35rem;margin-left:.2rem;vertical-align:middle">NOUVEAU</span>` : '';
+  const classicBadge= p.isClassic? `<span style="font-size:.55rem;background:#FEF9EC;color:#B45309;border-radius:3px;padding:.08rem .35rem;margin-left:.2rem;vertical-align:middle">★</span>` : '';
+  return `
+    <div class="product-chip ${STATE.selectedProducts.has(p.id)?'selected':''}" 
+         id="chip-${p.id}" onclick="toggleChip('${p.id}',this)">
+      <div class="chip-check"><i class="fas fa-check"></i></div>
+      <i class="${p.icon}" style="font-size:.75rem;color:var(--warm-gray)"></i>
+      <span>${p.name}${newBadge}${classicBadge}</span>
+      <i class="fas ${compatIcon}" style="font-size:.65rem;color:${compatColor};margin-left:.1rem;flex-shrink:0" title="${compat.messages[0]||''}"></i>
+      <i class="fas fa-flask-vial info-btn" title="Voir les ingrédients" onclick="event.stopPropagation();toggleIngPanel('${p.id}')"></i>
+    </div>
+    <div class="ingredient-panel" id="ing-${p.id}">
+      ${renderIngPanel(p)}
+    </div>`;
+}
+
+function renderIngPanel(p){
+  const compat = getCompatibility(p);
+  const compatClass = {good:'compat-good',warn:'compat-warn',bad:'compat-bad'}[compat.level];
+  const msgs = compat.messages.map(m=>`<div>• ${m}</div>`).join('');
+
+  // Render each ingredient as a clickable tag with links
+  const ingTags = p.keyIngredients.map(i=>{
+    const link = ingLink(i.name);
+    const icon = i.effect==='good'?'fa-circle-check':i.effect==='bad'?'fa-times-circle':i.effect==='caution'?'fa-triangle-exclamation':'fa-minus-circle';
+    const warningNote = i.effect==='caution' ? `<span style="margin-left:.3rem;font-size:.6rem;opacity:.8">— use with care</span>` :
+                        i.effect==='bad'     ? `<span style="margin-left:.3rem;font-size:.6rem;opacity:.8">— avoid</span>` :
+                        i.effect==='good'    ? `<span style="margin-left:.3rem;font-size:.6rem;opacity:.8">— recommended</span>` : '';
+    const linkBtns = link ? `
+      <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.4rem">
+        <a href="${link.mlxq}" target="_blank" 
+           style="font-size:.6rem;padding:.12rem .45rem;border-radius:4px;background:#FFE4EC;color:#C2185B;text-decoration:none;border:1px solid #FFAAC0;white-space:nowrap">
+          <i class="fas fa-leaf" style="font-size:.55rem"></i> Meili Diary — ${link.label}
+        </a>
+        <a href="${link.inci}" target="_blank"
+           style="font-size:.6rem;padding:.12rem .45rem;border-radius:4px;background:var(--blue-light);color:var(--blue);text-decoration:none;border:1px solid #B8D0E8;white-space:nowrap">
+          <i class="fas fa-flask-vial" style="font-size:.55rem"></i> INCI Decoder
+        </a>
+      </div>` : '';
+    return `
+      <div style="border:1px solid ${i.effect==='good'?'#C5D9C8':i.effect==='caution'?'#FDE68A':i.effect==='bad'?'#FCA5A5':'var(--beige)'};
+                  border-radius:8px;padding:.55rem .75rem;background:${i.effect==='good'?'#F0F9F1':i.effect==='caution'?'#FFFBEB':i.effect==='bad'?'#FEF2F2':'#F8F4EF'};">
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <i class="fas ${icon}" style="font-size:.7rem;color:${i.effect==='good'?'var(--green)':i.effect==='caution'?'var(--yellow)':i.effect==='bad'?'var(--red)':'var(--warm-gray)'}"></i>
+          <span style="font-size:.78rem;font-weight:500;color:var(--espresso)">${i.name}</span>
+          ${warningNote}
+        </div>
+        <div style="font-size:.7rem;color:var(--warm-gray);margin-top:.2rem;line-height:1.4">${i.note}</div>
+        ${linkBtns}
+      </div>`;
+  }).join('');
+
+  // Skin-dynamic flag sentence
+  const skinWarnings = p.badFor.filter(b=>STATE.skinTypes.has(b)||STATE.concerns.has(b)).map(b=>`<span style="background:var(--red-light);color:var(--red);padding:.1rem .4rem;border-radius:4px;font-size:.65rem;margin:.1rem"><i class="fas fa-times"></i> ${formatLabel(b)}</span>`).join('');
+  const skinGoods    = p.goodFor.filter(g=>STATE.skinTypes.has(g)||STATE.concerns.has(g)).map(g=>`<span style="background:var(--green-light);color:var(--green);padding:.1rem .4rem;border-radius:4px;font-size:.65rem;margin:.1rem"><i class="fas fa-check"></i> ${formatLabel(g)}</span>`).join('');
+
+  const badgeHtml = (p.isNew?`<span style="font-size:.58rem;background:#E8F4FD;color:#1A6FA5;border:1px solid #B8D8EE;border-radius:4px;padding:.1rem .45rem;margin-left:.4rem">✦ NEW</span>`:'') +
+                    (p.isClassic?`<span style="font-size:.58rem;background:#FEF9EC;color:#B45309;border:1px solid #FDE68A;border-radius:4px;padding:.1rem .45rem;margin-left:.4rem">★ Classique</span>`:'');
+
+  return `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.85rem">
+      <div>
+        <div style="font-size:.78rem;font-weight:500;color:var(--espresso);display:flex;align-items:center;gap:.3rem">
+          <i class="fas fa-flask-vial" style="color:var(--blue)"></i> ${p.name} ${badgeHtml}
+        </div>
+        <div style="font-size:.63rem;color:var(--warm-gray);margin-top:.2rem">${p.brandOrigin||p.brand}</div>
+      </div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+        <a href="${p.inciSearch?'https://incidecoder.com/products/'+p.inciSearch:'https://incidecoder.com'}" target="_blank" class="inci-link">
+          <i class="fas fa-external-link-alt" style="font-size:.55rem"></i> INCI Decoder
+        </a>
+        <a href="https://cosdna.com/search.php?q=${encodeURIComponent(p.name)}" target="_blank" class="inci-link">CosDNA</a>
+        <a href="https://www.meiliuxing.com/search?q=${encodeURIComponent(p.name)}" target="_blank" 
+           style="font-size:.65rem;color:#C2185B;text-decoration:none;border:1px solid #FFAAC0;border-radius:99px;padding:.2rem .6rem;background:#FFF0F5;transition:all .2s">
+          <i class="fas fa-leaf" style="font-size:.55rem"></i> Meili Diary
+        </a>
+      </div>
+    </div>
+
+    ${skinGoods||skinWarnings ? `
+    <div style="margin-bottom:.85rem;display:flex;flex-wrap:wrap;gap:.25rem;align-items:center">
+      <span style="font-size:.63rem;color:var(--warm-gray);margin-right:.2rem">Your skin profile match:</span>
+      ${skinGoods}${skinWarnings}
+    </div>` : ''}
+
+    <div style="display:grid;grid-template-columns:1fr;gap:.5rem;margin-bottom:.85rem">
+      ${ingTags}
+    </div>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.75rem">
+      <div style="font-size:.62rem;color:var(--warm-gray);display:flex;align-items:center;gap:.3rem"><div style="width:10px;height:10px;border-radius:3px;background:var(--green)"></div>Recommended</div>
+      <div style="font-size:.62rem;color:var(--warm-gray);display:flex;align-items:center;gap:.3rem"><div style="width:10px;height:10px;border-radius:3px;background:var(--yellow)"></div>Use with care</div>
+      <div style="font-size:.62rem;color:var(--warm-gray);display:flex;align-items:center;gap:.3rem"><div style="width:10px;height:10px;border-radius:3px;background:var(--red)"></div>Avoid for your skin</div>
+    </div>
+
+    <div class="skin-compatibility ${compatClass}">
+      <i class="fas ${compat.level==='good'?'fa-circle-check':compat.level==='warn'?'fa-triangle-exclamation':'fa-circle-xmark'}"></i>
+      <div>
+        <strong>${compat.level==='good'?'✓ Compatible avec votre profil':'⚠ Veuillez examiner les points suivants'}</strong>
+        <div style="margin-top:.2rem">${msgs}</div>
+      </div>
+    </div>`;
+}
+
+function toggleBrand(header){
+  header.classList.toggle('open');
+  const id='bp-'+header.querySelector('.brand-name').textContent.replace(/\W/g,'_');
+  const panel=document.getElementById(id);
+  panel.classList.toggle('open');
+}
+
+function toggleChip(id, el){
+  if(STATE.selectedProducts.has(id)){
+    STATE.selectedProducts.delete(id);
+    el.classList.remove('selected');
+  } else {
+    STATE.selectedProducts.add(id);
+    el.classList.add('selected');
+  }
+  updateSelectedSummary();
+  // Re-render compat icons on affected products (conflict check)
+  refreshCompatIcons();
+}
+
+function refreshCompatIcons(){
+  STATE.selectedProducts.forEach(id=>{
+    const chip = document.getElementById('chip-'+id);
+    if(!chip) return;
+    const p = PRODUCT_DB.find(x=>x.id===id);
+    if(!p) return;
+    const compat = getCompatibility(p);
+    const icon = chip.querySelector('.fa-check-circle,.fa-triangle-exclamation,.fa-times-circle');
+    if(icon){
+      const map={good:'fa-check-circle',warn:'fa-triangle-exclamation',bad:'fa-times-circle'};
+      const colMap={good:'var(--green)',warn:'#B45309',bad:'var(--red)'};
+      icon.className=`fas ${map[compat.level]}`;
+      icon.style.color=colMap[compat.level];
+      icon.title=compat.messages[0];
+    }
+    // Refresh open panels
+    const panel=document.getElementById('ing-'+id);
+    if(panel && panel.classList.contains('open')){
+      panel.innerHTML=renderIngPanel(p);
+    }
+  });
+}
+
+function toggleIngPanel(id){
+  const panel=document.getElementById('ing-'+id);
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')){
+    const p=PRODUCT_DB.find(x=>x.id===id);
+    panel.innerHTML=renderIngPanel(p);
+  }
+}
+
+function updateSelectedSummary(){
+  const card=document.getElementById('selected-summary-card');
+  const content=document.getElementById('selected-summary-content');
+  if(STATE.selectedProducts.size===0){ card.style.display='none'; return; }
+  card.style.display='block';
+  const chips = [...STATE.selectedProducts].map(id=>{
+    const p=PRODUCT_DB.find(x=>x.id===id);
+    if(!p) return '';
+    const compat=getCompatibility(p);
+    const cls=compat.level==='bad'?'missing-gap':compat.level==='warn'?'conflict-warn':'';
+    return `<div class="summary-chip ${cls}"><i class="${p.icon}" style="font-size:.65rem"></i>${p.brand} — ${p.name}</div>`;
+  }).join('');
+  content.innerHTML=`<div class="selected-summary">${chips}</div>
+    <p style="font-size:.7rem;color:var(--warm-gray);margin-top:.75rem"><i class="fas fa-info-circle"></i> Les éléments signalés ont des préoccupations d'ingrédients pour votre profil — nous les traiterons dans la routine.</p>`;
+}
+
+// ─── SECTION NAVIGATION ──────────────────────────────────
+let currentSection=1;
+function goToSection(n){
+  document.getElementById(`section-${currentSection}`).classList.remove('visible');
+  document.getElementById(`section-${currentSection}`).style.display='none';
+  currentSection=n;
+  const sec=document.getElementById(`section-${n}`);
+  sec.style.display='block';
+  setTimeout(()=>sec.classList.add('visible'),10);
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateNavDots(n);
+  if(n===3) renderCabinet();
+}
+
+function updateNavDots(n){
+  const dots=document.querySelectorAll('.nav-step');
+  dots.forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i+1<n) d.classList.add('done');
+    if(i+1===n) d.classList.add('active');
+  });
+}
+
+// ─── SKIN TYPE & CONCERN HANDLERS ───────────────────────
+document.querySelectorAll('.skin-type-card').forEach(c=>{
+  c.addEventListener('click',()=>{
+    c.classList.toggle('active');
+    const t=c.dataset.type;
+    if(STATE.skinTypes.has(t)) STATE.skinTypes.delete(t);
+    else STATE.skinTypes.add(t);
+  });
+});
+
+document.querySelectorAll('#concern-grid .concern-tag').forEach(t=>{
+  t.addEventListener('click',()=>{
+    t.classList.toggle('active');
+    const c=t.dataset.concern;
+    if(STATE.concerns.has(c)) STATE.concerns.delete(c);
+    else STATE.concerns.add(c);
+  });
+});
+
+// Today status — multi-select (like concerns)
+document.querySelectorAll('#today-status-group .concern-tag').forEach(t=>{
+  t.addEventListener('click',()=>{
+    const s = t.dataset.status;
+    if(STATE.todayStatus.has(s)){
+      STATE.todayStatus.delete(s);
+      t.classList.remove('active');
+    } else {
+      STATE.todayStatus.add(s);
+      t.classList.add('active');
+    }
+  });
+});
+
+// ─── ROUTINE LOGIC ───────────────────────────────────────
+function buildRoutine(){
+  const sel = id => STATE.selectedProducts.has(id);
+  const hasSkinType = t => STATE.skinTypes.has(t);
+  const hasConcern  = c => STATE.concerns.has(c);
+  const hasToday  = s => STATE.todayStatus.has(s);
+  const isDry    = hasToday('dry_deh') || hasToday('tight') || hasSkinType('dry');
+  const isOily   = hasToday('oily_con') || hasSkinType('oily');
+  const isSens   = hasToday('sensitive_red') || hasSkinType('sensitive');
+  const isBreak  = hasToday('breakout') || hasConcern('acne');
+  const isDull   = hasToday('dull_today') || hasConcern('dullness');
+  const lowHumid = ENV.humidity < 50;
+  const uvHigh   = ['Moderate','High'].includes(ENV.uv);
+  
+  const amSteps=[], pmSteps=[], gaps=[], alerts=[];
+
+  // Find selected products by category
+  const hasVitC    = PRODUCT_DB.filter(p=>p.category==='Vitamin C' && sel(p.id));
+  const hasRetinol = PRODUCT_DB.filter(p=>p.category==='Retinol' && sel(p.id));
+  const hasAHA     = PRODUCT_DB.filter(p=>['Exfoliant'].includes(p.category) && sel(p.id));
+  const hasSPF     = PRODUCT_DB.filter(p=>p.category==='SPF' || p.category==='Moisturiser+SPF').filter(p=>sel(p.id));
+  const hasHA      = PRODUCT_DB.filter(p=>p.category==='Hydration' && sel(p.id));
+  const hasMoist   = PRODUCT_DB.filter(p=>['Moisturiser','Repair Balm'].includes(p.category) && sel(p.id));
+  const hasCleanse = PRODUCT_DB.filter(p=>p.category==='Cleanser' && sel(p.id));
+  const hasNiacin  = PRODUCT_DB.filter(p=>p.id==='to_niacin' && sel(p.id));
+
+  // ── STEP: Cleanse ──
+  const cleanser = hasCleanse.length ? hasCleanse[0] : null;
+  amSteps.push({ action:'Cleanse', product: cleanser ? cleanser.name : 'Gentle Cleanser', note: cleanser ? cleanser.brand : 'Rincer à l'eau tiède', flags:cleanser ? skinFlags(cleanser) : [] });
+  pmSteps.push({ action:'Double nettoyage', product: cleanser ? cleanser.name : 'Oil Cleanser → Foaming Wash', note:'Élimine le FPS et les impuretés en profondeur', flags:[] });
+
+  // ── STEP: Treat AM (Vit C) ──
+  if(hasVitC.length){
+    const p=hasVitC[0];
+    amSteps.push({ action:'Treat', product:p.name, brand:p.brand, note:`${p.brand} · Antioxidant & brightening`, flags:skinFlags(p) });
+  }
+  if(hasNiacin.length){
+    const p=hasNiacin[0];
+    const slot = isOily ? 'am' : 'pm';
+    if(slot==='am') amSteps.push({ action:'Balance', product:p.name, brand:p.brand, note:`${p.brand} · Pore-minimising, oil control`, flags:skinFlags(p) });
+    else pmSteps.push({ action:'Balance', product:p.name, brand:p.brand, note:`${p.brand} · Pore-minimising, oil control`, flags:skinFlags(p) });
+  }
+
+  // ── STEP: Hydrate ──
+  if(isDry || lowHumid){
+    if(hasHA.length){
+      const p=hasHA[0];
+      amSteps.push({ action:'Hydrate', product:p.name, brand:p.brand, note:'Appliquer sur peau humide', flags:skinFlags(p) });
+      pmSteps.push({ action:'Hydrate', product:p.name, brand:p.brand, note:'Liaison d'humidité nocturne', flags:skinFlags(p) });
+    } else {
+      gaps.push({ product:'Hyaluronic Acid Serum', icon:'fas fa-droplet', reason:`Humidité faible (${ENV.humidity}%) + peau sèche : l'HA prévient la perte en eau.` });
+    }
+  } else if(hasHA.length){
+    const p=hasHA[0];
+    amSteps.push({ action:'Hydrate', product:p.name, brand:p.brand, note:p.brand, flags:skinFlags(p) });
+    pmSteps.push({ action:'Hydrate', product:p.name, brand:p.brand, note:p.brand, flags:skinFlags(p) });
+  }
+
+  // ── STEP: Moisturise ──
+  const moistAm = hasMoist.find(p=>!['moisturise_pm'].includes(p.slot)) || hasMoist[0];
+  const moistPm = hasMoist.find(p=>p.slot==='moisturise_pm') || hasMoist[0];
+  if(moistAm){
+    amSteps.push({ action:'Moisturise', product:moistAm.name, brand:moistAm.brand, note:moistAm.brand+' · Barrier seal', flags:skinFlags(moistAm) });
+  } else {
+    gaps.push({ product:'Moisturiser / Barrier Cream', icon:'fas fa-jar', reason:isDry?'Air froid et sec : une crème riche prévient la TEWL toute la journée.':'Scellés vos couches de sérum avec une crème hydratante.' });
+  }
+
+  // ── STEP: Protect (SPF) ──
+  if(uvHigh || hasVitC.length || hasRetinol.length){
+    if(hasSPF.length){
+      const p=hasSPF[0];
+      amSteps.push({ action:'Protect', product:p.name, brand:p.brand, note:`UV ${ENV.uv} aujourd'hui · Réappliquer toutes les 2h en ext.`, flags:skinFlags(p), isSPF:true });
+    } else {
+      amSteps.push({ action:'Protect', product:'SPF 50 Sunscreen ★ Needed', note:'Ajouté depuis les recommandations — absent de votre armoire', gapFill:true, flags:[] });
+      gaps.push({ product:'SPF 50 Sunscreen', icon:'fas fa-sun', reason:`UV ${ENV.uv}${hasVitC.length||hasRetinol.length?' + les actifs augmentent la photosensibilité':''} — le FPS est indispensable.` });
+    }
+  }
+
+  // ── PM: Retinol ──
+  const hasRetinolConflict = hasRetinol.length && hasAHA.length;
+  if(hasRetinol.length){
+    const p=hasRetinol[0];
+    pmSteps.push({ action:'Renew', product:p.name, brand:p.brand, note:'Commencer 2×/semaine · Utilisation PM uniquement', flags:skinFlags(p) });
+    if(hasRetinolConflict) alerts.push('retinol_aha');
+  }
+  if(hasAHA.length){
+    const p=hasAHA[0];
+    const inactive=hasRetinolConflict;
+    pmSteps.push({ action:'Exfoliate', product:p.name, brand:p.brand, note: inactive ? '★ Nuits alternées uniquement — pas ce soir (Rétinol programmé)' : '2–3 fois par semaine maximum', inactive, flags: inactive?[]:skinFlags(p) });
+  }
+
+  // ── PM Moisturise ──
+  if(moistPm){
+    pmSteps.push({ action:isDry?'Réparation de la barrière':'Moisturise', product:moistPm.name, brand:moistPm.brand, note:moistPm.brand+' · Overnight recovery', flags:skinFlags(moistPm) });
+  }
+
+  return { amSteps, pmSteps, gaps, alerts };
+}
+
+function skinFlags(product){
+  const flags=[];
+  if(!product) return flags;
+  const types=STATE.skinTypes, concerns=STATE.concerns;
+  product.goodFor.forEach(g=>{ if(types.has(g)||concerns.has(g)) flags.push({ label:formatLabel(g), type:'good' }); });
+  product.badFor.forEach(b=>{ if(types.has(b)||concerns.has(b)) flags.push({ label:`Avoid: ${formatLabel(b)}`, type:'bad' }); });
+  return flags.slice(0,3);
+}
+
+// ─── RENDER OUTPUT ───────────────────────────────────────
+function renderStep(s,i,period){
+  const numCls=period==='am'?'am-num':'pm-num';
+  const gapCls=s.gapFill?' gap-fill':'';
+  const inactStyle=s.inactive?'opacity:.45;':'' ;
+  const inactCls=s.inactive?' inactive':'';
+  const flagsHtml=s.flags&&s.flags.length?`<div class="step-ing-flags">${s.flags.map(f=>`<span class="step-flag flag-${f.type}">${f.label}</span>`).join('')}</div>`:'';
+  return `<div class="step-item${gapCls}${inactCls}" style="animation-delay:${.08+i*.07}s;${inactStyle}">
+    <div class="step-num ${numCls}">${i+1}</div>
+    <div class="step-text">
+      <div class="step-action">${s.action}</div>
+      <div class="step-product">${s.product}${s.brand&&!s.gapFill?`<span style="font-family:'DM Sans';font-size:.65rem;color:var(--warm-gray);font-weight:300;margin-left:.4rem">${s.brand}</span>`:''}  </div>
+      ${s.note?`<div class="step-note">${s.note}</div>`:''}
+      ${flagsHtml}
+    </div>
+  </div>`;
+}
+
+function renderGaps(gaps){
+  if(!gaps.length) return '';
+  return `<div class="gaps-section">
+    <div class="card-label" style="margin-bottom:0"><i class="fas fa-triangle-exclamation" style="color:var(--terracotta)"></i> Missing from Your Cabinet</div>
+    <div class="gaps-grid">${gaps.map(g=>`<div class="gap-card"><div class="gap-icon"><i class="${g.icon}"></i></div><div><div class="gap-name">${g.product}</div><div class="gap-why">${g.reason}</div></div></div>`).join('')}</div>
+  </div>`;
+}
+
+function renderSkinAnalysis(){
+  const types=[...STATE.skinTypes].map(t=>formatLabel(t)).join(', ')||'Not specified';
+  const concerns=[...STATE.concerns].map(c=>formatLabel(c)).join(', ')||'None selected';
+  const statusLabels={dry_deh:'Sèche & Déshydratée',oily_con:'Grasse & Congestionnée',sensitive_red:'Sensible & Rougie',tight:'Tendue & Stressée',dull_today:'Terne & Fatiguée',breakout:'Éruption active',balanced:'En équilibre'};
+  const todayArr=[...STATE.todayStatus].map(s=>statusLabels[s]||s);
+  const todayStr = todayArr.length ? todayArr.join(', ') : 'Not specified';
+  return `<div class="card-label" style="margin-bottom:0"><i class="fas fa-chart-radar" style="color:var(--terracotta)"></i> Your Skin Profile Summary</div>
+  <div class="analysis-grid">
+    <div class="analysis-card" style="background:#F4F0EC;border:1px solid var(--beige)">
+      <div class="analysis-card-label" style="color:var(--warm-gray)">Skin Type</div>
+      <div class="analysis-card-val" style="color:var(--espresso)">${types}</div>
+    </div>
+    <div class="analysis-card" style="background:#F0EDF0;border:1px solid #DDD5DD">
+      <div class="analysis-card-label" style="color:var(--warm-gray)">Concerns</div>
+      <div class="analysis-card-val" style="color:var(--espresso);font-size:.9rem">${concerns}</div>
+    </div>
+    <div class="analysis-card" style="background:#EEF4F0;border:1px solid #C5D9C8">
+      <div class="analysis-card-label" style="color:var(--warm-gray)">Today's Status</div>
+      <div class="analysis-card-val" style="color:var(--espresso)">${todayStr}</div>
+    </div>
+  </div>`;
+}
+
+// ─── GENERATE ────────────────────────────────────────────
+function generateRoutine(){
+  const loader=document.getElementById('loader');
+  loader.classList.add('active');
+  const steps=document.querySelectorAll('.loading-step');
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i<steps.length){ steps[i].classList.add('done'); i++; }
+    else {
+      clearInterval(iv);
+      setTimeout(()=>{
+        loader.classList.remove('active');
+        const {amSteps,pmSteps,gaps,alerts}=buildRoutine();
+        document.getElementById('am-steps').innerHTML=amSteps.map((s,j)=>renderStep(s,j,'am')).join('');
+        document.getElementById('pm-steps').innerHTML=pmSteps.map((s,j)=>renderStep(s,j,'pm')).join('');
+        document.getElementById('gaps-section').innerHTML=renderGaps(gaps);
+        document.getElementById('skin-analysis').innerHTML=renderSkinAnalysis();
+
+        // Alert
+        const alertEl=document.getElementById('alert-section');
+        alertEl.innerHTML=alerts.includes('retinol_aha')?`<div class="copilot-alert">
+          <i class="fas fa-triangle-exclamation alert-icon"></i>
+          <div class="alert-text">
+            <div class="alert-label"><i class="fas fa-robot"></i> Skin Copilot Alert</div>
+            Utiliser du Rétinol et des AHA/BHA la même nuit risque d'endommager la barrière cutanée. Nous avons planifié le Rétinol ce soir et retiré l'exfoliant. Alternez les soirs.
+          </div></div>`:'';
+
+        // Context chips
+        const chip=txt=>`<span style="font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .65rem;border-radius:99px;background:var(--cream);border:1px solid var(--beige);color:var(--warm-gray)">${txt}</span>`;
+        document.getElementById('context-chips').innerHTML=
+          chip(`<i class="fas fa-location-dot" style="color:var(--terracotta)"></i> ${ENV.location}`)+
+          chip(`<i class="fas fa-sun" style="color:var(--gold)"></i> UV ${ENV.uv}`)+
+          chip(`<i class="fas fa-droplet" style="color:var(--mist)"></i> ${ENV.humidity}% Humidity`)+
+          ([...STATE.skinTypes].map(t=>chip(formatLabel(t))).join(''));
+
+        // Skin tags on poster
+        const tagColors={dry:'#E8F0F8;color:#4A6FA5',oily:'#F0FDE8;color:#3D7A3D',sensitive:'#FDE8F0;color:#A54A6F',combination:'#FEF9EC;color:#B45309',normal:'#F0F0EE;color:#6B6B60'};
+        document.getElementById('poster-skin-tags').innerHTML=[...STATE.skinTypes].map(t=>`<span class="pskin-tag" style="background:${tagColors[t]?.split(';')[0]||'var(--cream)'};border:1px solid var(--beige);${tagColors[t]?.split(';')[1]||''}">${formatLabel(t)}</span>`).join('')+
+          [...STATE.concerns].map(c=>`<span class="pskin-tag" style="background:#F0EDE8;border:1px solid var(--beige);color:var(--warm-gray)">${formatLabel(c)}</span>`).join('');
+
+        // Meta
+        const now=new Date();
+        document.getElementById('poster-meta').textContent=
+          now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' · '+ENV.location+' · '+ENV.temp;
+
+        // Dynamic product rec + Amazon link
+        const RECS = {
+          acne:   { name:'La Roche-Posay Effaclar Mat Mattifying Moisturizer', desc:'Oil control · pore-minimising · formulated for blemish-prone skin', url:'https://www.amazon.com/s?k=La+Roche-Posay+Effaclar+Mat' },
+          rosacea:{ name:'Avène Antirougeurs Fort Relief Concentrate', desc:'Redness relief · derma-pharmacy grade · calms reactive skin', url:'https://www.amazon.com/s?k=Avene+Antirougeurs+Fort+Relief+Concentrate' },
+          aging:  { name:'Lancôme Advanced Génifique Youth Activating Serum', desc:'Microbiome repair · skin renewal activation · iconic anti-aging serum', url:'https://www.amazon.com/s?k=Lancome+Advanced+Genifique+Serum' },
+          hyper:  { name:"L'Oréal Paris Revitalift 5% Glycolic Acid Toner", desc:'Brightens dark spots · 5% glycolic acid resurfacing · affordable cult product', url:'https://www.amazon.com/s?k=LOreal+Revitalift+Glycolic+Acid+Toner' },
+          dry:    { name:'Embryolisse Lait-Crème Concentré', desc:'Deep nourishment · ideal for cold, dry weather · French pharmacy classic', url:'https://www.amazon.com/s?k=Embryolisse+Lait-Creme+Concentre' },
+          barrier:{ name:'La Roche-Posay Cicaplast Baume B5+', desc:'Barrier repair · Madecassoside + Ceramides · soothes and protects', url:'https://www.amazon.com/s?k=La+Roche-Posay+Cicaplast+Baume+B5' },
+          default:{ name:'Vichy Minéral 89 Hyaluronic Acid Booster', desc:'15% hyaluronic acid · strengthens barrier · Vichy volcanic mineral water', url:'https://www.amazon.com/s?k=Vichy+Mineral+89+Hyaluronic+Acid' },
+        };
+        let rec = RECS.default;
+        if(STATE.concerns.has('acne'))             rec = RECS.acne;
+        else if(STATE.concerns.has('rosacea'))     rec = RECS.rosacea;
+        else if(STATE.concerns.has('aging'))       rec = RECS.aging;
+        else if(STATE.concerns.has('hyperpigmentation')) rec = RECS.hyper;
+        else if(STATE.concerns.has('barrier'))     rec = RECS.barrier;
+        else if(STATE.skinTypes.has('dry'))        rec = RECS.dry;
+
+        document.getElementById('rec-product-name').textContent = rec.name;
+        document.getElementById('rec-product-desc').textContent = rec.desc;
+        document.getElementById('rec-amazon-link').href = rec.url;
+        window._recAmazonUrl = rec.url;
+
+        // Nav dots
+        steps.forEach(s=>s.classList.remove('done'));
+        goToSection(4);
+      },400);
+    }
+  },480);
+}
+
+// ─── AMAZON LINK ─────────────────────────────────────────
+function openAmazon(e){
+  const url = window._recAmazonUrl || 'https://www.amazon.com/s?k=skincare';
+  window.open(url,'_blank');
+  return false;
+}
+
+// ─── RESET ───────────────────────────────────────────────
+function resetApp(){
+  document.querySelectorAll('.loading-step').forEach(s=>s.classList.remove('done'));
+  goToSection(3);
+}
+</script>
+</body>
+</html>
