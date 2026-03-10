@@ -266,7 +266,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,244,239,
 <!-- NAV -->
 <nav>
   <div class="nav-logo">Skincare <span>Copilot</span></div>
-  <div class="nav-steps" id="nav-steps">
+  <div style="display:flex;gap:.3rem;align-items:center;margin-left:auto;padding-left:1rem"><a href="index.html" style="font-size:.65rem;letter-spacing:.06em;font-family:'DM Sans',sans-serif;padding:.3rem .65rem;border:1px solid var(--beige);border-radius:99px;text-decoration:none;transition:all .2s ease;background:var(--espresso);color:var(--cream);border-color:var(--espresso);">EN</a><a href="index-zh.html" style="font-size:.65rem;letter-spacing:.06em;font-family:'DM Sans',sans-serif;padding:.3rem .65rem;border:1px solid var(--beige);border-radius:99px;text-decoration:none;transition:all .2s ease;background:transparent;color:var(--warm-gray);">中文</a><a href="index-fr.html" style="font-size:.65rem;letter-spacing:.06em;font-family:'DM Sans',sans-serif;padding:.3rem .65rem;border:1px solid var(--beige);border-radius:99px;text-decoration:none;transition:all .2s ease;background:transparent;color:var(--warm-gray);">FR</a></div>
+  <div class="nav-steps" id="nav-steps" style="margin-left:.75rem">
     <div class="nav-step active" title="Skin Profile"></div>
     <div style="width:20px;height:1px;background:var(--beige)"></div>
     <div class="nav-step" title="Environment"></div>
@@ -412,11 +413,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,244,239,
       <div class="card-label"><i class="fas fa-face-smile-wink"></i> How Does Your Skin Feel Right Now?</div>
       <div class="section-desc" style="margin-bottom:1rem">Select all that apply — this fine-tunes today's routine on top of your baseline profile.</div>
       <div class="concern-grid" id="today-status-group">
-        <div class="concern-tag active" data-status="dry_deh"><i class="fas fa-droplet-slash"></i> Dry &amp; Dehydrated</div>
-        <div class="concern-tag" data-status="oily_con"><i class="fas fa-circle-dot"></i> Oily &amp; Congested</div>
-        <div class="concern-tag" data-status="sensitive_red"><i class="fas fa-heart-crack"></i> Sensitive &amp; Red</div>
-        <div class="concern-tag" data-status="tight"><i class="fas fa-compress"></i> Tight &amp; Stressed</div>
-        <div class="concern-tag" data-status="dull_today"><i class="fas fa-cloud"></i> Dull &amp; Tired</div>
+        <div class="concern-tag active" data-status="dry_deh"><i class="fas fa-droplet-slash"></i> Dry & Dehydrated</div>
+        <div class="concern-tag" data-status="oily_con"><i class="fas fa-circle-dot"></i> Oily & Congested</div>
+        <div class="concern-tag" data-status="sensitive_red"><i class="fas fa-heart-crack"></i> Sensitive & Red</div>
+        <div class="concern-tag" data-status="tight"><i class="fas fa-compress"></i> Tight & Stressed</div>
+        <div class="concern-tag" data-status="dull_today"><i class="fas fa-cloud"></i> Dull & Tired</div>
         <div class="concern-tag" data-status="breakout"><i class="fas fa-circle-exclamation"></i> Active Breakout</div>
         <div class="concern-tag" data-status="balanced"><i class="fas fa-check-circle"></i> Feeling Balanced</div>
       </div>
@@ -438,7 +439,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(248,244,239,
     <div class="fade-up">
       <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.5rem">Cabinet — Step 3 of 3</div>
       <div class="section-title" style="font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,4vw,2.4rem)">My Product Cabinet</div>
-      <p class="section-desc">Select brands and products you own. Click <i class="fas fa-flask-vial" style="color:var(--blue)"></i> on any product to see its ingredients analysed against your skin profile.</p>
+      <p class="section-desc">Select brands and products you own. Click the flask icon on any product to see its ingredients analysed against your skin profile.</p>
     </div>
 
     <!-- Cabinet accordion — JS renders this -->
@@ -551,6 +552,78 @@ const STATE = {
 };
 
 const ENV = { temp:'14°C', uv:'Moderate', humidity:40, location:'Nantes' };
+
+// ─── TRANSLATIONS ───────────────────────────────────────
+const T = {
+  js_skin_type: 'Skin Type',
+  js_concerns: 'Concerns',
+  js_today_status: 'Today\'s Status',
+  js_profile_summary: 'Your Skin Profile Summary',
+  js_missing: 'Missing from Your Cabinet',
+  js_alert_label: 'Skin Copilot Alert',
+  js_alert_body: 'Using Retinol and AHA/BHA on the same night risks barrier damage and severe irritation. We\'ve scheduled Retinol for tonight and crossed out the exfoliant. Use them on alternate evenings.',
+  js_compatible: '✓ Compatible with your profile',
+  js_review: '⚠ Please review the following',
+  js_skin_match: 'Your skin profile match:',
+  js_ing_recommended: 'Recommended',
+  js_ing_caution: 'Use with care',
+  js_ing_avoid: 'Avoid for your skin',
+  js_ing_note_rec: '— recommended',
+  js_ing_note_caut: '— use with care',
+  js_ing_note_avoid: '— avoid',
+  js_brand_click: 'Click to browse',
+  js_brand_products: 'products',
+  js_brand_classic: 'classic',
+  js_brand_new: 'new',
+  js_badge_new: 'NEW',
+  js_badge_classic: '★ Classic',
+  js_ing_panel_title: 'Key Ingredients',
+  js_meili: 'Meili Diary',
+  js_ing_tooltip: 'View ingredients',
+  js_selected_note: 'Flagged items have ingredient concerns for your skin profile — we\'ll address them in the routine.',
+  js_apply_damp: 'Apply to damp skin',
+  js_overnight: 'Overnight moisture-binding',
+  js_barrier_seal: 'Barrier seal',
+  js_overnight_rec: 'Overnight recovery',
+  js_uv_reapply: 'Reapply every 2h outdoors',
+  js_spf_gap: 'Added from recommended — not in your cabinet',
+  js_retinol_note: 'Start 2×/week · Use only PM',
+  js_exfol_inactive: '★ Alternate nights only — not tonight (Retinol scheduled)',
+  js_exfol_note: 'Max 2–3× per week',
+  js_cleanse_note: 'Rinse with lukewarm water',
+  js_dblcleanse: 'Double Cleanse',
+  js_dblcleanse_note: 'Removes SPF & impurities thoroughly',
+  js_ha_gap: 'Low humidity ({h}%) + dry skin: HA prevents transepidermal water loss.',
+  js_moist_gap_dry: 'Dry + cold air: a rich moisturiser prevents TEWL all day.',
+  js_moist_gap: 'Seal in your serum layers with a moisturiser.',
+  js_spf_gap_note: 'UV is {uv} today · Reapply every 2h outdoors',
+  js_spf_gap_reason: 'UV is {uv}{extra} — SPF is non-negotiable.',
+  js_spf_extra: ' + actives increase photosensitivity',
+  js_antioxidant: 'Antioxidant & brightening',
+  js_pore_control: 'Pore-minimising, oil control',
+  js_barrier_repair: 'Barrier Repair',
+  tsd_dry_deh: 'Dry & Dehydrated',
+  tsd_oily_con: 'Oily & Congested',
+  tsd_sensitive_red: 'Sensitive & Red',
+  tsd_tight: 'Tight & Stressed',
+  tsd_dull_today: 'Dull & Tired',
+  tsd_breakout: 'Active Breakout',
+  tsd_balanced: 'Balanced',
+  fl_dry: 'Dry Skin',
+  fl_oily: 'Oily Skin',
+  fl_sensitive: 'Sensitive Skin',
+  fl_combination: 'Combination',
+  fl_normal: 'Normal Skin',
+  fl_acne: 'Acne',
+  fl_rosacea: 'Rosacea',
+  fl_hyperpigmentation: 'Hyperpigmentation',
+  fl_aging: 'Aging',
+  fl_dehydration: 'Dehydration',
+  fl_barrier: 'Compromised Barrier',
+  fl_pores: 'Enlarged Pores',
+  fl_eczema: 'Eczema',
+  fl_dullness: 'Dullness',
+};
 
 // ─── INGREDIENT REFERENCE LINKS ──────────────────────────
 // Maps ingredient name → { mlxq (Meili Diary / 美丽修行), inci (INCI Decoder) }
